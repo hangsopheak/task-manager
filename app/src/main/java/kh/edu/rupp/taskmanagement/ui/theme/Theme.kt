@@ -1,6 +1,8 @@
 package kh.edu.rupp.taskmanagement.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -36,10 +38,41 @@ private val LightColors = lightColorScheme(
     outlineVariant = GrayBlue80
 )
 
+private val DarkColors = darkColorScheme(
+    primary = Blue80,
+    onPrimary = Blue20,
+    primaryContainer = Blue30,
+    onPrimaryContainer = Blue90,
+    secondary = Amber70,
+    onSecondary = Amber20,
+    secondaryContainer = Amber30,
+    onSecondaryContainer = Amber90,
+    tertiary = Slate80,
+    onTertiary = Slate20,
+    tertiaryContainer = Slate30,
+    onTertiaryContainer = Slate90,
+    error = Red80,
+    onError = Red20,
+    errorContainer = Red30,
+    onErrorContainer = Red90,
+    background = Gray06,
+    onBackground = Gray90,
+    surface = Gray06,
+    onSurface = Gray90,
+    surfaceVariant = GrayBlue30,
+    onSurfaceVariant = GrayBlue80,
+    surfaceContainerLow = Gray10,
+    surfaceContainer = Gray12,
+    surfaceContainerHigh = Gray17,
+    surfaceContainerHighest = Gray22,
+    outline = GrayBlue60,
+    outlineVariant = GrayBlue30
+)
+
 @Composable
 fun TaskManagerTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = LightColors,
+        colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors,
         typography = Typography,
         content = content
     )
