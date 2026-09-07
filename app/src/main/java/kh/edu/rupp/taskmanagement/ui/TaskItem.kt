@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,16 +42,27 @@ fun TaskItem(task: Task, modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(
+                    horizontal = dimensionResource(R.dimen.card_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.card_padding_vertical)
+                ),
+            horizontalArrangement =
+                Arrangement.spacedBy(dimensionResource(R.dimen.card_row_spacing))
         ) {
             // the box stays empty on every card: nothing reads isDone yet
             Box(
                 Modifier
-                    .size(18.dp)
-                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(3.dp))
+                    .size(dimensionResource(R.dimen.check_box_size))
+                    .border(
+                        dimensionResource(R.dimen.check_box_border),
+                        MaterialTheme.colorScheme.outline,
+                        RoundedCornerShape(3.dp)
+                    )
             )
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(
+                verticalArrangement =
+                    Arrangement.spacedBy(dimensionResource(R.dimen.card_text_spacing))
+            ) {
                 Text(
                     task.title,
                     style = MaterialTheme.typography.titleMedium,
