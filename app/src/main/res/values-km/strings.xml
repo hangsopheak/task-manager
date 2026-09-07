@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">គ្រប់គ្រងកិច្ចការ</string>
+    <string name="task_due_label">ផុតកំណត់</string>
+    <string name="priority_low">ទាប</string>
+    <string name="priority_medium">មធ្យម</string>
+    <string name="priority_high">ខ្ពស់</string>
+</resources>
