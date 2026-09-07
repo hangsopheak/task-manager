@@ -65,8 +65,9 @@ fun TaskItem(task: Task, modifier: Modifier = Modifier) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                val dueLabel = stringResource(R.string.task_due_label)
                 Text(
-                    "${dueDateText(task.dueDate)} · ${priorityLabel(task.priority)}",
+                    "$dueLabel ${dueDateText(task.dueDate)} · ${priorityLabel(task.priority)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
