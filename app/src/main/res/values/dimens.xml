@@ -1,0 +1,10 @@
+<resources>
+    <dimen name="list_padding">16dp</dimen>
+    <dimen name="list_spacing">8dp</dimen>
+    <dimen name="card_padding_horizontal">16dp</dimen>
+    <dimen name="card_padding_vertical">12dp</dimen>
+    <dimen name="card_row_spacing">12dp</dimen>
+    <dimen name="card_text_spacing">2dp</dimen>
+    <dimen name="check_box_size">18dp</dimen>
+    <dimen name="check_box_border">2dp</dimen>
+</resources>
