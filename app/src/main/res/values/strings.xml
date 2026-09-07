@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Task Manager</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_high">High</string>
+    <string name="task_detail_title">Task detail</string>
+    <string name="task_due">due %1$s</string>
+    <string name="task_done">done</string>
+    <string name="task_not_done">not done</string>
 </resources>

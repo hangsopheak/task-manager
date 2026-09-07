@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
@@ -35,7 +36,7 @@ fun TaskManagerApp() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text("Task Manager") })
+            TopAppBar(title = { Text(stringResource(R.string.app_name)) })
         }
     ) { innerPadding ->
         TaskListScreen(sampleTasks, Modifier.padding(innerPadding))
