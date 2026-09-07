@@ -19,8 +19,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
@@ -31,7 +33,7 @@ fun TaskDetailScreen(task: Task, modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text("Task detail") })
+            TopAppBar(title = { Text(stringResource(R.string.task_detail_title)) })
         }
     ) { innerPadding ->
         Column(
@@ -53,7 +55,7 @@ fun TaskDetailScreen(task: Task, modifier: Modifier = Modifier) {
                 )
             }
             Text(
-                "due ${dueDateText(task.dueDate)}",
+                stringResource(R.string.task_due, dueDateText(task.dueDate)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -72,7 +74,7 @@ fun TaskDetailScreen(task: Task, modifier: Modifier = Modifier) {
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    if (task.isDone) "done" else "not done",
+                    if (task.isDone) stringResource(R.string.task_done) else stringResource(R.string.task_not_done),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )

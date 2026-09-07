@@ -14,9 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
@@ -26,10 +28,11 @@ import java.time.format.DateTimeFormatter
 
 fun dueDateText(date: LocalDate): String = date.format(DateTimeFormatter.ofPattern("EEE d MMM"))
 
+@Composable
 fun priorityLabel(priority: Priority): String = when (priority) {
-    Priority.LOW -> "Low"
-    Priority.MEDIUM -> "Medium"
-    Priority.HIGH -> "High"
+    Priority.LOW -> stringResource(R.string.priority_low)
+    Priority.MEDIUM -> stringResource(R.string.priority_medium)
+    Priority.HIGH -> stringResource(R.string.priority_high)
 }
 
 @Composable
