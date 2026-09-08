@@ -24,7 +24,7 @@ class ConceptsActivity : ComponentActivity() {
             TaskManagerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(Modifier.padding(innerPadding)) {
-                        ThemePlayground()
+                        CounterDemo()
                     }
                 }
             }
