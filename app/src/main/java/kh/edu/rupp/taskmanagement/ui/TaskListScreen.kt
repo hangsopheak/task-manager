@@ -16,6 +16,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -32,7 +33,7 @@ import java.time.LocalDate
 fun TaskListScreen(initialTasks: List<Task>, modifier: Modifier = Modifier) {
     // the screen above the cards keeps the list, so every card can stay stateless
     val tasks = remember { initialTasks.toMutableStateList() }
-    var selectedFilter by remember { mutableStateOf(TaskFilter.ALL) }
+    var selectedFilter by rememberSaveable { mutableStateOf(TaskFilter.ALL) }
     // the count and the visible rows are worked out from the list, never stored beside it
     val doneCount by remember { derivedStateOf { tasks.count { it.isDone } } }
     val filterCounts by remember {
