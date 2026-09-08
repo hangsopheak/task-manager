@@ -8,4 +8,6 @@
     <string name="task_due">due %1$s</string>
     <string name="task_done">done</string>
     <string name="task_not_done">not done</string>
+    <string name="new_task_title">New task</string>
+    <string name="new_task_description">Added from the plus button.</string>
 </resources>
