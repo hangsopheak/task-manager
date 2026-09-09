@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,7 +58,12 @@ fun TaskItem(
                 Arrangement.spacedBy(dimensionResource(R.dimen.card_row_spacing)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(checked = isDone, onCheckedChange = { onToggle() })
+            // the box is its own control, so it says which task it belongs to
+            Checkbox(
+                checked = isDone,
+                onCheckedChange = { onToggle() },
+                modifier = Modifier.semantics { contentDescription = task.title }
+            )
             Column(
                 verticalArrangement =
                     Arrangement.spacedBy(dimensionResource(R.dimen.card_text_spacing))
