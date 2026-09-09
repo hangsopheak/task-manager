@@ -1,10 +1,17 @@
 package kh.edu.rupp.taskmanagement.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kh.edu.rupp.taskmanagement.data.rememberTaskStore
+import kh.edu.rupp.taskmanagement.ui.AppShell
+import kh.edu.rupp.taskmanagement.ui.SettingsScreen
+import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 
@@ -12,23 +19,46 @@ import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 fun TaskNavHost() {
     val nav = rememberNavController()
     val store = rememberTaskStore()
-    NavHost(navController = nav, startDestination = Routes.LIST) {
-        composable(Routes.LIST) {
-            TaskListScreen(
-                tasks = store.tasks,
-                onToggle = { store.toggle(it) },
-                onAdd = { title, description -> store.add(title, description) },
-                onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) }
-            )
+    val entry by nav.currentBackStackEntryAsState()
+    val currentRoute = entry?.destination?.route
+    AppShell(
+        currentRoute = currentRoute,
+        onSelectTab = { tab ->
+            nav.navigate(tab.route) {
+                // the selected tab is state, not a pile of screens, so keep one entry per tab
+                popUpTo(Routes.LIST)
+                launchSingleTop = true
+            }
         }
-        composable(Routes.DETAIL) { entry ->
-            val task = store.find(entry.arguments?.getString(Routes.TASK_ID))
-            if (task != null) {
-                TaskDetailScreen(
-                    task = task,
-                    onToggle = { store.toggle(task) },
-                    onBack = { nav.popBackStack() }
+    ) { innerPadding ->
+        NavHost(
+            navController = nav,
+            startDestination = Routes.LIST,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Routes.LIST) {
+                TaskListScreen(
+                    tasks = store.tasks,
+                    onToggle = { store.toggle(it) },
+                    onAdd = { title, description -> store.add(title, description) },
+                    onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) }
                 )
+            }
+            composable(Routes.DETAIL) { backStackEntry ->
+                val task = store.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
+                if (task != null) {
+                    TaskDetailScreen(
+                        task = task,
+                        onToggle = { store.toggle(task) },
+                        onBack = { nav.popBackStack() }
+                    )
+                }
+            }
+            composable(Routes.STATS) {
+                StatsScreen()
+            }
+            composable(Routes.SETTINGS) {
+                SettingsScreen()
             }
         }
     }
