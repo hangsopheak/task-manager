@@ -77,7 +77,7 @@ fun TaskListScreen(initialTasks: List<Task>, modifier: Modifier = Modifier) {
                 contentPadding = PaddingValues(dimensionResource(R.dimen.list_padding)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.list_spacing))
             ) {
-                items(visibleTasks) { task ->
+                items(visibleTasks, key = { it.id }) { task ->
                     TaskItem(
                         task = task,
                         isDone = task.isDone,
