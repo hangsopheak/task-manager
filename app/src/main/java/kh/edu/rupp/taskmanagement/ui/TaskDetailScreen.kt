@@ -1,5 +1,6 @@
 package kh.edu.rupp.taskmanagement.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,10 +18,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +42,9 @@ fun TaskDetailScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val shareText = stringResource(R.string.share_task_text, task.title, dueDateText(task.dueDate))
+    val chooserTitle = stringResource(R.string.share_chooser_title)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -51,6 +57,20 @@ fun TaskDetailScreen(
                             painterResource(R.drawable.ic_arrow_back),
                             contentDescription = stringResource(R.string.back)
                         )
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = {
+                            // nothing here names an app: Android asks the user who can take this
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                            }
+                            context.startActivity(Intent.createChooser(intent, chooserTitle))
+                        }
+                    ) {
+                        Text(stringResource(R.string.share))
                     }
                 }
             )
