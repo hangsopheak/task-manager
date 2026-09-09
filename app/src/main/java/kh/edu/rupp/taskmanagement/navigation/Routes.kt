@@ -4,6 +4,8 @@ package kh.edu.rupp.taskmanagement.navigation
 object Routes {
     const val LIST = "list"
     const val DETAIL = "detail/{taskId}"
+    const val STATS = "stats"
+    const val SETTINGS = "settings"
     const val TASK_ID = "taskId"
 
     fun detail(taskId: String) = "detail/$taskId"
