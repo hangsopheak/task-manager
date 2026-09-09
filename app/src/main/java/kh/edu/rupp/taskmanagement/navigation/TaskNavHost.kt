@@ -55,7 +55,7 @@ fun TaskNavHost() {
                 }
             }
             composable(Routes.STATS) {
-                StatsScreen()
+                StatsScreen(store.tasks)
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen()

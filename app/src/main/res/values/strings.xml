@@ -22,6 +22,11 @@
     <string name="tab_settings">Settings</string>
     <string name="stats_title">Stats</string>
     <string name="settings_title">Settings</string>
+    <string name="stats_total">total</string>
+    <string name="stats_done">done</string>
+    <string name="stats_active">active</string>
+    <string name="stats_by_priority">By priority</string>
+    <string name="stats_next_due">Next due</string>
     <string name="settings_coming_later">Coming in later sessions</string>
     <string name="settings_from_session">Session %1$d</string>
     <string name="settings_sort_order">Sort order</string>
