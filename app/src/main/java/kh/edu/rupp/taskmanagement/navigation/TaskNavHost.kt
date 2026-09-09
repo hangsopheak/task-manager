@@ -24,7 +24,11 @@ fun TaskNavHost() {
         composable(Routes.DETAIL) { entry ->
             val task = store.find(entry.arguments?.getString(Routes.TASK_ID))
             if (task != null) {
-                TaskDetailScreen(task)
+                TaskDetailScreen(
+                    task = task,
+                    onToggle = { store.toggle(task) },
+                    onBack = { nav.popBackStack() }
+                )
             }
         }
     }
