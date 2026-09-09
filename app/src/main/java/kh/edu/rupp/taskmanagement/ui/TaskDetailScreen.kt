@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +64,8 @@ fun TaskDetailScreen(
                 },
                 actions = {
                     TextButton(
+                        // a text action defaults to 40dp high, under the 48dp target
+                        modifier = Modifier.heightIn(min = 48.dp),
                         onClick = {
                             // nothing here names an app: Android asks the user who can take this
                             val intent = Intent(Intent.ACTION_SEND).apply {
@@ -76,56 +81,79 @@ fun TaskDetailScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        TaskDetailContent(
+            task = task,
+            onToggle = onToggle,
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+        )
+    }
+}
+
+// the body on its own, so a wide screen can show it beside the list
+@Composable
+fun TaskDetailContent(
+    task: Task,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val doneLabel = stringResource(R.string.task_done)
+    Column(modifier.fillMaxSize()) {
+        Text(task.title, style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                priorityLabel(task.priority),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                "·",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Text(
+                stringResource(R.string.task_due, dueDateText(task.dueDate)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+        // the detail screen has the room to show the description in full
+        Text(
+            task.description,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.widthIn(max = 640.dp)
+        )
+        Spacer(Modifier.weight(1f))
+        // the caps do nothing on a phone and stop a wide pane stretching the row
+        Card(
+            modifier = Modifier
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
         ) {
-            Spacer(Modifier.height(8.dp))
-            Text(task.title, style = MaterialTheme.typography.headlineSmall)
-            Spacer(Modifier.height(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 72.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    priorityLabel(task.priority),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.secondary
+                    doneLabel,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
                 )
-                Text(
-                    "·",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-                Text(
-                    stringResource(R.string.task_due, dueDateText(task.dueDate)),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                // the same event the list card sends, so the two screens cannot disagree
+                Switch(
+                    checked = task.isDone,
+                    onCheckedChange = { onToggle() },
+                    modifier = Modifier.semantics { contentDescription = doneLabel }
                 )
             }
-            Spacer(Modifier.height(16.dp))
-            // the detail screen has the room to show the description in full
-            Text(task.description, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.weight(1f))
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 72.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.task_done),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    // the same event the list card sends, so the two screens cannot disagree
-                    Switch(checked = task.isDone, onCheckedChange = { onToggle() })
-                }
-            }
-            Spacer(Modifier.height(16.dp))
         }
     }
 }
