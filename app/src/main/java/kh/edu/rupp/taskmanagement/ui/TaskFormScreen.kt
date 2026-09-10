@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -18,6 +19,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -57,6 +59,16 @@ fun TaskFormScreen(
                             contentDescription = stringResource(R.string.back)
                         )
                     }
+                },
+                actions = {
+                    TextButton(
+                        // a text action defaults to 40dp high, under the 48dp target
+                        modifier = Modifier.heightIn(min = 48.dp),
+                        onClick = {},
+                        enabled = state.isValid
+                    ) {
+                        Text(stringResource(R.string.save))
+                    }
                 }
             )
         }
@@ -75,6 +87,10 @@ fun TaskFormScreen(
                 value = state.title,
                 onValueChange = { state.title = it },
                 label = { Text(stringResource(R.string.form_title_label)) },
+                isError = !state.isTitleValid,
+                supportingText = {
+                    if (!state.isTitleValid) Text(stringResource(R.string.form_title_error))
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
