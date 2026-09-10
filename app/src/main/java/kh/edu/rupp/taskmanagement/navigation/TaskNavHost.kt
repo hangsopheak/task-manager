@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
+import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.rememberTaskStore
 import kh.edu.rupp.taskmanagement.ui.AppShell
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
@@ -46,14 +47,18 @@ fun TaskNavHost() {
                     TaskListDetailScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onAdd = { nav.navigate(Routes.ADD) }
+                        onAdd = { nav.navigate(Routes.ADD) },
+                        message = store.message,
+                        onMessageShown = { store.message = null }
                     )
                 } else {
                     TaskListScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
                         onAdd = { nav.navigate(Routes.ADD) },
-                        onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) }
+                        onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) },
+                        message = store.message,
+                        onMessageShown = { store.message = null }
                     )
                 }
             }
@@ -63,7 +68,8 @@ fun TaskNavHost() {
                     TaskDetailScreen(
                         task = task,
                         onToggle = { store.toggle(task) },
-                        onBack = { nav.popBackStack() }
+                        onBack = { nav.popBackStack() },
+                        onEdit = { nav.navigate(Routes.edit(task.id)) }
                     )
                 }
             }
@@ -71,7 +77,12 @@ fun TaskNavHost() {
                 TaskFormScreen(
                     task = null,
                     otherTitles = store.tasks.map { it.title },
-                    onBack = { nav.popBackStack() }
+                    onBack = { nav.popBackStack() },
+                    onSave = { title, description, dueDate, priority ->
+                        store.save(null, title, description, dueDate, priority)
+                        store.message = R.string.task_saved
+                        nav.popBackStack()
+                    }
                 )
             }
             composable(Routes.EDIT) { backStackEntry ->
@@ -81,7 +92,12 @@ fun TaskNavHost() {
                     TaskFormScreen(
                         task = task,
                         otherTitles = store.tasks.filter { it.id != task.id }.map { it.title },
-                        onBack = { nav.popBackStack() }
+                        onBack = { nav.popBackStack() },
+                        onSave = { title, description, dueDate, priority ->
+                            store.save(task.id, title, description, dueDate, priority)
+                            store.message = R.string.task_saved
+                            nav.popBackStack()
+                        }
                     )
                 }
             }

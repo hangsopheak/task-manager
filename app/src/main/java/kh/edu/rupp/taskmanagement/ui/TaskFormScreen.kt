@@ -31,6 +31,7 @@ import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.ui.components.DueDateField
 import kh.edu.rupp.taskmanagement.ui.form.rememberTaskFormState
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +39,7 @@ fun TaskFormScreen(
     task: Task?,
     otherTitles: List<String>,
     onBack: () -> Unit,
+    onSave: (String, String, LocalDate, Priority) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // one screen for both jobs: a task to edit, or nothing to start from
@@ -65,7 +67,9 @@ fun TaskFormScreen(
                     TextButton(
                         // a text action defaults to 40dp high, under the 48dp target
                         modifier = Modifier.heightIn(min = 48.dp),
-                        onClick = {},
+                        onClick = {
+                            onSave(state.title, state.description, state.dueDate, state.priority)
+                        },
                         enabled = state.isValid
                     ) {
                         Text(stringResource(R.string.save))
