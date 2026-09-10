@@ -11,8 +11,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -21,7 +25,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
+import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.DueDateField
 import kh.edu.rupp.taskmanagement.ui.form.rememberTaskFormState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +78,52 @@ fun TaskFormScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(
+                value = state.description,
+                onValueChange = { state.description = it },
+                label = { Text(stringResource(R.string.form_description)) },
+                minLines = 4,
+                modifier = Modifier.fillMaxWidth()
+            )
+            PriorityPicker(
+                selected = state.priority,
+                onSelect = { state.priority = it }
+            )
+            DueDateField(
+                dueDate = state.dueDate,
+                onPick = { state.dueDate = it }
+            )
+        }
+    }
+}
+
+// three values, one of them on: the row cannot hold two priorities or none
+@Composable
+private fun PriorityPicker(
+    selected: Priority,
+    onSelect: (Priority) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(R.string.form_priority),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            Priority.entries.forEachIndexed { index, priority ->
+                SegmentedButton(
+                    selected = priority == selected,
+                    onClick = { onSelect(priority) },
+                    shape = SegmentedButtonDefaults.itemShape(index, Priority.entries.size),
+                    colors = SegmentedButtonDefaults.colors(
+                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    icon = {},
+                    label = { Text(priorityLabel(priority)) }
+                )
+            }
         }
     }
 }
