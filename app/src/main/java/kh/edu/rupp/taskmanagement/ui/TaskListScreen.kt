@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -36,6 +40,8 @@ fun TaskListScreen(
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
     onTaskClick: (String) -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedFilter by rememberSaveable { mutableStateOf(TaskFilter.ALL) }
@@ -63,6 +69,26 @@ fun TaskListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.app_name)) })
+        },
+        snackbarHost = {
+            // the bar is on screen for as long as there is something to say and no longer
+            if (message != null) {
+                Snackbar(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.list_padding)),
+                    action = {
+                        TextButton(
+                            onClick = onMessageShown,
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = SnackbarDefaults.actionColor
+                            )
+                        ) {
+                            Text(stringResource(R.string.dismiss))
+                        }
+                    }
+                ) {
+                    Text(stringResource(message))
+                }
+            }
         }
     ) { innerPadding ->
         Box(

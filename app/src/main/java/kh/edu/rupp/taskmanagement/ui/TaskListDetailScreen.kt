@@ -22,6 +22,8 @@ fun TaskListDetailScreen(
     tasks: List<Task>,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedId by rememberSaveable { mutableStateOf(tasks.firstOrNull()?.id) }
@@ -32,6 +34,8 @@ fun TaskListDetailScreen(
             onToggle = onToggle,
             onAdd = onAdd,
             onTaskClick = { selectedId = it },
+            message = message,
+            onMessageShown = onMessageShown,
             modifier = Modifier.width(440.dp)
         )
         VerticalDivider()

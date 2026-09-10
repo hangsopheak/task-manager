@@ -43,6 +43,7 @@ fun TaskDetailScreen(
     task: Task,
     onToggle: () -> Unit,
     onBack: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -63,6 +64,12 @@ fun TaskDetailScreen(
                     }
                 },
                 actions = {
+                    TextButton(
+                        modifier = Modifier.heightIn(min = 48.dp),
+                        onClick = onEdit
+                    ) {
+                        Text(stringResource(R.string.edit))
+                    }
                     TextButton(
                         // a text action defaults to 40dp high, under the 48dp target
                         modifier = Modifier.heightIn(min = 48.dp),
@@ -162,6 +169,6 @@ fun TaskDetailContent(
 @Composable
 fun TaskDetailScreenPreview() {
     TaskManagerTheme {
-        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {})
+        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {})
     }
 }
