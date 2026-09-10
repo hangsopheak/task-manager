@@ -69,7 +69,12 @@ fun TaskNavHost() {
                         task = task,
                         onToggle = { store.toggle(task) },
                         onBack = { nav.popBackStack() },
-                        onEdit = { nav.navigate(Routes.edit(task.id)) }
+                        onEdit = { nav.navigate(Routes.edit(task.id)) },
+                        onDelete = {
+                            store.delete(task)
+                            store.message = R.string.task_deleted
+                            nav.popBackStack()
+                        }
                     )
                 }
             }

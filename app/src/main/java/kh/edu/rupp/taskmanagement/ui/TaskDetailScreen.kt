@@ -22,6 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.ConfirmDeleteDialog
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,8 +49,11 @@ fun TaskDetailScreen(
     onToggle: () -> Unit,
     onBack: () -> Unit,
     onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // whether the question is on screen is this screen's business and nobody else's
+    var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val shareText = stringResource(R.string.share_task_text, task.title, dueDateText(task.dueDate))
     val chooserTitle = stringResource(R.string.share_chooser_title)
@@ -69,6 +77,12 @@ fun TaskDetailScreen(
                         onClick = onEdit
                     ) {
                         Text(stringResource(R.string.edit))
+                    }
+                    TextButton(
+                        modifier = Modifier.heightIn(min = 48.dp),
+                        onClick = { isDeleteAsked = true }
+                    ) {
+                        Text(stringResource(R.string.delete))
                     }
                     TextButton(
                         // a text action defaults to 40dp high, under the 48dp target
@@ -95,6 +109,15 @@ fun TaskDetailScreen(
                 .padding(innerPadding)
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
         )
+        if (isDeleteAsked) {
+            ConfirmDeleteDialog(
+                onConfirm = {
+                    isDeleteAsked = false
+                    onDelete()
+                },
+                onDismiss = { isDeleteAsked = false }
+            )
+        }
     }
 }
 
@@ -169,6 +192,6 @@ fun TaskDetailContent(
 @Composable
 fun TaskDetailScreenPreview() {
     TaskManagerTheme {
-        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {})
+        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {}, onDelete = {})
     }
 }
