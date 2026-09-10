@@ -27,6 +27,10 @@ class TaskStore(startTasks: List<Task>) {
         tasks[index] = task.copy(isDone = !task.isDone)
     }
 
+    fun delete(task: Task) {
+        tasks.removeAll { it.id == task.id }
+    }
+
     // one function for both jobs: an id that is already here is an edit, anything else is new
     fun save(
         taskId: String?,

@@ -10,6 +10,9 @@
     <string name="back">Back</string>
     <string name="share">Share</string>
     <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_task_title">Delete this task?</string>
+    <string name="delete_task_message">This cannot be undone.</string>
     <string name="share_chooser_title">Share task</string>
     <string name="share_task_text">%1$s, due %2$s</string>
     <string name="tasks_done_count">%1$d of %2$d done</string>
@@ -28,6 +31,7 @@
     <string name="form_pick_date">Pick a date</string>
     <string name="save">Save</string>
     <string name="task_saved">Task saved</string>
+    <string name="task_deleted">Task deleted</string>
     <string name="dismiss">Dismiss</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
