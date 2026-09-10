@@ -2,6 +2,7 @@ package kh.edu.rupp.taskmanagement.navigation
 
 // a route is a plain string the graph knows, and the task id travels inside it
 object Routes {
+    const val LOGIN = "login"
     const val LIST = "list"
     const val DETAIL = "detail/{taskId}"
     const val ADD = "add"

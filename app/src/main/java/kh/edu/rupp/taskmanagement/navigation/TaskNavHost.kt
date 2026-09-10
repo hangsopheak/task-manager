@@ -13,6 +13,7 @@ import androidx.window.core.layout.WindowSizeClass
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.rememberTaskStore
 import kh.edu.rupp.taskmanagement.ui.AppShell
+import kh.edu.rupp.taskmanagement.ui.LoginScreen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
@@ -38,9 +39,18 @@ fun TaskNavHost() {
     ) { innerPadding ->
         NavHost(
             navController = nav,
-            startDestination = Routes.LIST,
+            startDestination = Routes.LOGIN,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Routes.LOGIN) {
+                // nothing is checked yet, so both buttons do the one thing they can do
+                val openTasks = {
+                    nav.navigate(Routes.LIST) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                }
+                LoginScreen(onSignIn = openTasks, onCreateAccount = openTasks)
+            }
             composable(Routes.LIST) {
                 // the same tasks either way: only how much of them fits on screen changes
                 if (isWideScreen()) {
