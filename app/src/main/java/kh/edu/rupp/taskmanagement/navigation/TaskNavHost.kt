@@ -15,6 +15,7 @@ import kh.edu.rupp.taskmanagement.ui.AppShell
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
+import kh.edu.rupp.taskmanagement.ui.TaskFormScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 
@@ -45,13 +46,13 @@ fun TaskNavHost() {
                     TaskListDetailScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onAdd = { title, description -> store.add(title, description) }
+                        onAdd = { nav.navigate(Routes.ADD) }
                     )
                 } else {
                     TaskListScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onAdd = { title, description -> store.add(title, description) },
+                        onAdd = { nav.navigate(Routes.ADD) },
                         onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) }
                     )
                 }
@@ -64,6 +65,15 @@ fun TaskNavHost() {
                         onToggle = { store.toggle(task) },
                         onBack = { nav.popBackStack() }
                     )
+                }
+            }
+            composable(Routes.ADD) {
+                TaskFormScreen(task = null, onBack = { nav.popBackStack() })
+            }
+            composable(Routes.EDIT) { backStackEntry ->
+                val task = store.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
+                if (task != null) {
+                    TaskFormScreen(task = task, onBack = { nav.popBackStack() })
                 }
             }
             composable(Routes.STATS) {

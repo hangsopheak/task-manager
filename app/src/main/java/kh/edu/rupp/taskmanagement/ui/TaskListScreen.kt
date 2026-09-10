@@ -34,7 +34,7 @@ import kh.edu.rupp.taskmanagement.ui.components.FilterChipRow
 fun TaskListScreen(
     tasks: List<Task>,
     onToggle: (Task) -> Unit,
-    onAdd: (String, String) -> Unit,
+    onAdd: () -> Unit,
     onTaskClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -53,8 +53,6 @@ fun TaskListScreen(
     }
     // the list changes on every tick, but this answer flips only at the last one
     val allDone by remember { derivedStateOf { tasks.isNotEmpty() && tasks.all { it.isDone } } }
-    val newTitle = stringResource(R.string.new_task_title)
-    val newDescription = stringResource(R.string.new_task_description)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -105,7 +103,7 @@ fun TaskListScreen(
                 }
             }
             FloatingActionButton(
-                onClick = { onAdd(newTitle, newDescription) },
+                onClick = onAdd,
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)

@@ -21,7 +21,7 @@ import kh.edu.rupp.taskmanagement.model.Task
 fun TaskListDetailScreen(
     tasks: List<Task>,
     onToggle: (Task) -> Unit,
-    onAdd: (String, String) -> Unit,
+    onAdd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedId by rememberSaveable { mutableStateOf(tasks.firstOrNull()?.id) }
