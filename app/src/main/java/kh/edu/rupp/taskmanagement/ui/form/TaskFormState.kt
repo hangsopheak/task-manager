@@ -16,6 +16,13 @@ class TaskFormState(task: Task?) {
     var priority by mutableStateOf(task?.priority ?: Priority.MEDIUM)
     // a fixed date, never today, so the empty form reads the same in any year
     var dueDate by mutableStateOf(task?.dueDate ?: LocalDate.of(2025, 9, 12))
+
+    // nothing keeps a record of whether the form is valid: it is worked out from the values
+    val isTitleValid: Boolean
+        get() = title.isNotBlank()
+
+    val isValid: Boolean
+        get() = isTitleValid
 }
 
 // a new task starts empty, an existing one starts filled in
