@@ -68,12 +68,21 @@ fun TaskNavHost() {
                 }
             }
             composable(Routes.ADD) {
-                TaskFormScreen(task = null, onBack = { nav.popBackStack() })
+                TaskFormScreen(
+                    task = null,
+                    otherTitles = store.tasks.map { it.title },
+                    onBack = { nav.popBackStack() }
+                )
             }
             composable(Routes.EDIT) { backStackEntry ->
                 val task = store.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
                 if (task != null) {
-                    TaskFormScreen(task = task, onBack = { nav.popBackStack() })
+                    // the task being edited keeps its own title, so leave it out of the list
+                    TaskFormScreen(
+                        task = task,
+                        otherTitles = store.tasks.filter { it.id != task.id }.map { it.title },
+                        onBack = { nav.popBackStack() }
+                    )
                 }
             }
             composable(Routes.STATS) {

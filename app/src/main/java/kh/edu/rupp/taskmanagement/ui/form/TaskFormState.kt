@@ -10,7 +10,7 @@ import kh.edu.rupp.taskmanagement.model.Task
 import java.time.LocalDate
 
 // one holder for the whole form, so the screen reads and writes one thing
-class TaskFormState(task: Task?) {
+class TaskFormState(task: Task?, private val otherTitles: List<String>) {
     var title by mutableStateOf(task?.title ?: "")
     var description by mutableStateOf(task?.description ?: "")
     var priority by mutableStateOf(task?.priority ?: Priority.MEDIUM)
@@ -21,10 +21,20 @@ class TaskFormState(task: Task?) {
     val isTitleValid: Boolean
         get() = title.isNotBlank()
 
+    // this rule needs the other tasks: two rows with one title cannot be told apart
+    val isTitleFree: Boolean
+        get() = otherTitles.none { it.equals(title.trim(), ignoreCase = true) }
+
+    // this rule needs two fields: urgent work has to say what it is
+    val isDescriptionValid: Boolean
+        get() = priority != Priority.HIGH || description.isNotBlank()
+
+    // every rule for this form is above, so there is one place to read and one to change
     val isValid: Boolean
-        get() = isTitleValid
+        get() = isTitleValid && isTitleFree && isDescriptionValid
 }
 
 // a new task starts empty, an existing one starts filled in
 @Composable
-fun rememberTaskFormState(task: Task?): TaskFormState = remember(task) { TaskFormState(task) }
+fun rememberTaskFormState(task: Task?, otherTitles: List<String>): TaskFormState =
+    remember(task, otherTitles) { TaskFormState(task, otherTitles) }
