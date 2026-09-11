@@ -19,7 +19,9 @@
     <string name="form_title_edit">Edit task</string>
     <string name="form_title_label">Title (required)</string>
     <string name="form_title_error">Title cannot be empty</string>
+    <string name="form_title_taken">Another task already uses this title</string>
     <string name="form_description">Description</string>
+    <string name="form_description_error">A High priority task needs a description</string>
     <string name="form_priority">Priority</string>
     <string name="form_due_date">Due date</string>
     <string name="form_pick_date">Pick a date</string>

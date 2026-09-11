@@ -36,11 +36,12 @@ import kh.edu.rupp.taskmanagement.ui.form.rememberTaskFormState
 @Composable
 fun TaskFormScreen(
     task: Task?,
+    otherTitles: List<String>,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // one screen for both jobs: a task to edit, or nothing to start from
-    val state = rememberTaskFormState(task)
+    val state = rememberTaskFormState(task, otherTitles)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -87,9 +88,13 @@ fun TaskFormScreen(
                 value = state.title,
                 onValueChange = { state.title = it },
                 label = { Text(stringResource(R.string.form_title_label)) },
-                isError = !state.isTitleValid,
+                isError = !state.isTitleValid || !state.isTitleFree,
                 supportingText = {
-                    if (!state.isTitleValid) Text(stringResource(R.string.form_title_error))
+                    if (!state.isTitleValid) {
+                        Text(stringResource(R.string.form_title_error))
+                    } else if (!state.isTitleFree) {
+                        Text(stringResource(R.string.form_title_taken))
+                    }
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -98,6 +103,12 @@ fun TaskFormScreen(
                 value = state.description,
                 onValueChange = { state.description = it },
                 label = { Text(stringResource(R.string.form_description)) },
+                isError = !state.isDescriptionValid,
+                supportingText = {
+                    if (!state.isDescriptionValid) {
+                        Text(stringResource(R.string.form_description_error))
+                    }
+                },
                 minLines = 4,
                 modifier = Modifier.fillMaxWidth()
             )
