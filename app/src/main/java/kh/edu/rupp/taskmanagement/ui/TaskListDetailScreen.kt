@@ -15,22 +15,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.TaskUiState
 
 // a wide screen has room for both, so the tap picks a task instead of opening a new screen
 @Composable
 fun TaskListDetailScreen(
-    tasks: List<Task>,
+    state: TaskUiState,
+    onRetry: () -> Unit,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
     message: Int?,
     onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val tasks = (state as? TaskUiState.Success)?.tasks ?: emptyList()
     var selectedId by rememberSaveable { mutableStateOf(tasks.firstOrNull()?.id) }
     val selected = tasks.firstOrNull { it.id == selectedId }
     Row(modifier.fillMaxSize()) {
         TaskListScreen(
-            tasks = tasks,
+            state = state,
+            onRetry = onRetry,
             onToggle = onToggle,
             onAdd = onAdd,
             onTaskClick = { selectedId = it },

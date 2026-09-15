@@ -29,12 +29,25 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.EmptyView
+import kh.edu.rupp.taskmanagement.ui.components.ErrorView
+import kh.edu.rupp.taskmanagement.ui.components.LoadingView
 import kh.edu.rupp.taskmanagement.ui.components.PriorityBar
 import kh.edu.rupp.taskmanagement.ui.components.StatTile
 
+@Composable
+fun StatsScreen(state: TaskUiState, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    when (state) {
+        is TaskUiState.Loading -> LoadingView(modifier)
+        is TaskUiState.Empty -> EmptyView(modifier)
+        is TaskUiState.Error -> ErrorView(onRetry = onRetry, message = state.message, modifier = modifier)
+        is TaskUiState.Success -> StatsContent(state.tasks, modifier)
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen(tasks: List<Task>, modifier: Modifier = Modifier) {
+private fun StatsContent(tasks: List<Task>, modifier: Modifier = Modifier) {
     // every number here is worked out from the one task list, so nothing can fall behind
     val doneCount by remember { derivedStateOf { tasks.count { it.isDone } } }
     val priorityCounts by remember {

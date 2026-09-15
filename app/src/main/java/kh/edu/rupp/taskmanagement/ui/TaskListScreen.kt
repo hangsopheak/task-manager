@@ -31,11 +31,42 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.EmptyView
+import kh.edu.rupp.taskmanagement.ui.components.ErrorView
 import kh.edu.rupp.taskmanagement.ui.components.FilterChipRow
+import kh.edu.rupp.taskmanagement.ui.components.LoadingView
+
+@Composable
+fun TaskListScreen(
+    state: TaskUiState,
+    onRetry: () -> Unit,
+    onToggle: (Task) -> Unit,
+    onAdd: () -> Unit,
+    onTaskClick: (String) -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // four states are not defensive programming, they are the four things that actually happen
+    when (state) {
+        is TaskUiState.Loading -> LoadingView(modifier)
+        is TaskUiState.Empty -> EmptyView(modifier)
+        is TaskUiState.Error -> ErrorView(onRetry = onRetry, message = state.message, modifier = modifier)
+        is TaskUiState.Success -> TaskListContent(
+            tasks = state.tasks,
+            onToggle = onToggle,
+            onAdd = onAdd,
+            onTaskClick = onTaskClick,
+            message = message,
+            onMessageShown = onMessageShown,
+            modifier = modifier
+        )
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListScreen(
+private fun TaskListContent(
     tasks: List<Task>,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,

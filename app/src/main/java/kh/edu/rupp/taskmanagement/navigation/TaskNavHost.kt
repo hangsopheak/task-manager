@@ -3,15 +3,16 @@ package kh.edu.rupp.taskmanagement.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import kh.edu.rupp.taskmanagement.R
-import kh.edu.rupp.taskmanagement.data.rememberTaskStore
 import kh.edu.rupp.taskmanagement.ui.AppShell
 import kh.edu.rupp.taskmanagement.ui.LoginScreen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
@@ -20,11 +21,16 @@ import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskFormScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
+import kh.edu.rupp.taskmanagement.ui.TaskUiState
+import kh.edu.rupp.taskmanagement.ui.TaskViewModel
+import kh.edu.rupp.taskmanagement.ui.components.LoadingView
 
 @Composable
 fun TaskNavHost() {
     val nav = rememberNavController()
-    val store = rememberTaskStore()
+    // one view model above the graph, so every screen reads and changes the same state
+    val vm: TaskViewModel = viewModel()
+    LaunchedEffect(Unit) { vm.load() }
     val entry by nav.currentBackStackEntryAsState()
     val currentRoute = entry?.destination?.route
     AppShell(
@@ -52,72 +58,75 @@ fun TaskNavHost() {
                 LoginScreen(onSignIn = openTasks, onCreateAccount = openTasks)
             }
             composable(Routes.LIST) {
-                // the same tasks either way: only how much of them fits on screen changes
+                // the same state either way: only how much of it fits on screen changes
                 if (isWideScreen()) {
                     TaskListDetailScreen(
-                        tasks = store.tasks,
-                        onToggle = { store.toggle(it) },
+                        state = vm.state,
+                        onRetry = { vm.load() },
+                        onToggle = { vm.toggle(it) },
                         onAdd = { nav.navigate(Routes.ADD) },
-                        message = store.message,
-                        onMessageShown = { store.message = null }
+                        message = vm.message,
+                        onMessageShown = { vm.onMessageShown() }
                     )
                 } else {
                     TaskListScreen(
-                        tasks = store.tasks,
-                        onToggle = { store.toggle(it) },
+                        state = vm.state,
+                        onRetry = { vm.load() },
+                        onToggle = { vm.toggle(it) },
                         onAdd = { nav.navigate(Routes.ADD) },
                         onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) },
-                        message = store.message,
-                        onMessageShown = { store.message = null }
+                        message = vm.message,
+                        onMessageShown = { vm.onMessageShown() }
                     )
                 }
             }
             composable(Routes.DETAIL) { backStackEntry ->
-                val task = store.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
+                val task = vm.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
                 if (task != null) {
                     TaskDetailScreen(
                         task = task,
-                        onToggle = { store.toggle(task) },
+                        onToggle = { vm.toggle(task) },
                         onBack = { nav.popBackStack() },
                         onEdit = { nav.navigate(Routes.edit(task.id)) },
                         onDelete = {
-                            store.delete(task)
-                            store.message = R.string.task_deleted
+                            vm.delete(task)
                             nav.popBackStack()
                         }
                     )
+                } else {
+                    LoadingView()
                 }
             }
             composable(Routes.ADD) {
                 TaskFormScreen(
                     task = null,
-                    otherTitles = store.tasks.map { it.title },
+                    otherTitles = vm.taskTitles(excludeId = null),
                     onBack = { nav.popBackStack() },
                     onSave = { title, description, dueDate, priority ->
-                        store.save(null, title, description, dueDate, priority)
-                        store.message = R.string.task_saved
+                        vm.save(null, title, description, dueDate, priority)
                         nav.popBackStack()
                     }
                 )
             }
             composable(Routes.EDIT) { backStackEntry ->
-                val task = store.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
+                val task = vm.find(backStackEntry.arguments?.getString(Routes.TASK_ID))
                 if (task != null) {
                     // the task being edited keeps its own title, so leave it out of the list
                     TaskFormScreen(
                         task = task,
-                        otherTitles = store.tasks.filter { it.id != task.id }.map { it.title },
+                        otherTitles = vm.taskTitles(excludeId = task.id),
                         onBack = { nav.popBackStack() },
                         onSave = { title, description, dueDate, priority ->
-                            store.save(task.id, title, description, dueDate, priority)
-                            store.message = R.string.task_saved
+                            vm.save(task.id, title, description, dueDate, priority)
                             nav.popBackStack()
                         }
                     )
+                } else {
+                    LoadingView()
                 }
             }
             composable(Routes.STATS) {
-                StatsScreen(store.tasks)
+                StatsScreen(vm.state, onRetry = { vm.load() })
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen()
