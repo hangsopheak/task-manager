@@ -49,13 +49,13 @@ fun TaskNavHost() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.LOGIN) {
-                // nothing is checked yet, so both buttons do the one thing they can do
+                // the buttons are real now: both of them end in the same place, signed in
                 val openTasks = {
                     nav.navigate(Routes.LIST) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
-                LoginScreen(onSignIn = openTasks, onCreateAccount = openTasks)
+                LoginScreen(onSignIn = openTasks)
             }
             composable(Routes.LIST) {
                 // the same state either way: only how much of it fits on screen changes

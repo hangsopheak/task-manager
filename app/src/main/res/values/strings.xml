@@ -64,4 +64,9 @@
     <string name="state_empty_hint">Add a task with the + button</string>
     <string name="state_error_title">Could not load the list</string>
     <string name="state_retry">Retry</string>
+    <string name="login_error_weak_password">That password is too short. Use at least %1$d characters.</string>
+    <string name="login_error_invalid_credentials">That email and password do not match. Try again.</string>
+    <string name="login_error_user_collision">An account with that email already exists. Sign in instead.</string>
+    <string name="login_error_network">No connection. Check the network and try again.</string>
+    <string name="login_error_other">Something went wrong. Try again.</string>
 </resources>

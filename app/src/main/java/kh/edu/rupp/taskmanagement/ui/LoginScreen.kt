@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,6 +36,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kh.edu.rupp.taskmanagement.auth.AuthError
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.ui.form.MIN_PASSWORD_LENGTH
 import kh.edu.rupp.taskmanagement.ui.form.rememberLoginFormState
@@ -41,10 +46,13 @@ import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 @Composable
 fun LoginScreen(
     onSignIn: () -> Unit,
-    onCreateAccount: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state = rememberLoginFormState()
+    val vm: LoginViewModel = viewModel()
+    val submitting = vm.state is LoginUiState.Submitting
+    // sign in is the one thing this screen waits for, so it watches and navigates
+    LaunchedEffect(vm.signedIn) { if (vm.signedIn) onSignIn() }
     Column(
         // this screen sits outside the tab shell, so it clears the system bars itself
         modifier = modifier
@@ -135,16 +143,34 @@ fun LoginScreen(
             )
             Spacer(Modifier.height(8.dp))
             Button(
-                onClick = onSignIn,
-                enabled = state.isValid,
+                onClick = { vm.signIn(state.email, state.password) },
+                enabled = state.isValid && !submitting,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
             ) {
+                if (submitting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(Modifier.width(12.dp))
+                }
                 Text(stringResource(R.string.login_sign_in))
             }
+            val error = (vm.state as? LoginUiState.Error)?.error
+            if (error != null) {
+                Text(
+                    authErrorMessage(error),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             TextButton(
-                onClick = onCreateAccount,
+                onClick = { vm.createAccount(state.email, state.password) },
+                enabled = state.isValid && !submitting,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -156,10 +182,11 @@ fun LoginScreen(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    TaskManagerTheme {
-        LoginScreen(onSignIn = {}, onCreateAccount = {})
-    }
+private fun authErrorMessage(error: AuthError): String = when (error) {
+    AuthError.WeakPassword -> stringResource(R.string.login_error_weak_password, MIN_PASSWORD_LENGTH)
+    AuthError.InvalidCredentials -> stringResource(R.string.login_error_invalid_credentials)
+    AuthError.UserCollision -> stringResource(R.string.login_error_user_collision)
+    AuthError.Network -> stringResource(R.string.login_error_network)
+    AuthError.Other -> stringResource(R.string.login_error_other)
 }
