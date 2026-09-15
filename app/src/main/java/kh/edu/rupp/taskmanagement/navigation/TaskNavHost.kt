@@ -131,7 +131,15 @@ fun TaskNavHost() {
                 StatsScreen(vm.state, onRetry = { vm.load() })
             }
             composable(Routes.SETTINGS) {
-                SettingsScreen()
+                SettingsScreen(
+                    email = loginVm.userEmail,
+                    onSignOut = {
+                        loginVm.signOut()
+                        nav.navigate(Routes.LOGIN) {
+                            popUpTo(Routes.LIST) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }

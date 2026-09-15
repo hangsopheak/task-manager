@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,7 +22,11 @@ import kh.edu.rupp.taskmanagement.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    email: String,
+    onSignOut: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -43,7 +48,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             SettingRow(R.string.settings_sort_order, 10)
             SettingRow(R.string.settings_theme, 10)
             SettingRow(R.string.settings_reminders, 11)
-            SettingRow(R.string.settings_account, 9)
+            AccountSection(email = email, onSignOut = onSignOut)
         }
     }
 }
@@ -68,5 +73,34 @@ private fun SettingRow(label: Int, session: Int) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+
+// the first real row: who is signed in, and the way out
+@Composable
+private fun AccountSection(email: String, onSignOut: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.settings_account),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                email,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        OutlinedButton(onClick = onSignOut) {
+            Text(stringResource(R.string.settings_sign_out))
+        }
     }
 }

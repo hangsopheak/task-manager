@@ -21,6 +21,15 @@ class LoginViewModel(private val repository: AuthRepository = AuthRepository()) 
     var signedIn by mutableStateOf(false)
         private set
 
+    // the address Firebase says is signed in, read through the one door that knows
+    val userEmail: String
+        get() = repository.userEmail
+
+    fun signOut() {
+        repository.signOut()
+        signedIn = false
+    }
+
     fun signIn(email: String, password: String) {
         submit { repository.signIn(email, password) }
     }
