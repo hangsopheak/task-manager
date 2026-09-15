@@ -45,11 +45,11 @@ import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
 @Composable
 fun LoginScreen(
+    vm: LoginViewModel,
     onSignIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state = rememberLoginFormState()
-    val vm: LoginViewModel = viewModel()
     val submitting = vm.state is LoginUiState.Submitting
     // sign in is the one thing this screen waits for, so it watches and navigates
     LaunchedEffect(vm.signedIn) { if (vm.signedIn) onSignIn() }

@@ -11,6 +11,10 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: AuthRepository = AuthRepository()) : ViewModel() {
 
+    // read once when the app starts: Firebase, not the app, remembers the session
+    var signedInAtStart by mutableStateOf(repository.isSignedIn)
+        private set
+
     var state by mutableStateOf<LoginUiState>(LoginUiState.Idle)
         private set
 

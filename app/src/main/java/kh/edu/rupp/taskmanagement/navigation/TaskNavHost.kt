@@ -19,6 +19,7 @@ import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskFormScreen
+import kh.edu.rupp.taskmanagement.ui.LoginViewModel
 import kh.edu.rupp.taskmanagement.ui.TaskListDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 import kh.edu.rupp.taskmanagement.ui.TaskUiState
@@ -30,6 +31,7 @@ fun TaskNavHost() {
     val nav = rememberNavController()
     // one view model above the graph, so every screen reads and changes the same state
     val vm: TaskViewModel = viewModel()
+    val loginVm: LoginViewModel = viewModel()
     LaunchedEffect(Unit) { vm.load() }
     val entry by nav.currentBackStackEntryAsState()
     val currentRoute = entry?.destination?.route
@@ -45,7 +47,7 @@ fun TaskNavHost() {
     ) { innerPadding ->
         NavHost(
             navController = nav,
-            startDestination = Routes.LOGIN,
+            startDestination = if (loginVm.signedInAtStart) Routes.LIST else Routes.LOGIN,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.LOGIN) {
@@ -55,7 +57,7 @@ fun TaskNavHost() {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
-                LoginScreen(onSignIn = openTasks)
+                LoginScreen(vm = loginVm, onSignIn = openTasks)
             }
             composable(Routes.LIST) {
                 // the same state either way: only how much of it fits on screen changes
