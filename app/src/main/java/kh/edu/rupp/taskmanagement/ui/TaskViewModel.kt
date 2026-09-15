@@ -54,47 +54,50 @@ class TaskViewModel(private val repository: TaskRepository = TaskRepository()) :
             ?: emptyList()
 
     fun toggle(task: Task) {
-        editInPlace(task.copy(isDone = !task.isDone))
+        viewModelScope.launch {
+            repository.updateTask(task.copy(isDone = !task.isDone))
+            load()
+        }
     }
 
     fun delete(task: Task) {
-        val tasks = (state as? TaskUiState.Success)?.tasks ?: return
-        state = TaskUiState.Success(tasks.filter { it.id != task.id })
-        message = R.string.task_deleted
+        viewModelScope.launch {
+            repository.deleteTask(task.id)
+            message = R.string.task_deleted
+            load()
+        }
     }
 
     // one function for both jobs: an id that is already here is an edit, anything else is new
     fun save(taskId: String?, title: String, description: String, dueDate: LocalDate, priority: Priority) {
-        val tasks = (state as? TaskUiState.Success)?.tasks ?: return
-        val index = tasks.indexOfFirst { it.id == taskId }
-        state = if (index >= 0) {
-            TaskUiState.Success(tasks.copyAt(index, tasks[index].copy(
-                title = title,
-                description = description,
-                dueDate = dueDate,
-                priority = priority
-            )))
-        } else {
-            // the newest task goes on top, where the user is already looking
-            TaskUiState.Success(listOf(
-                Task(
-                    id = "t${nextNumber++}",
-                    title = title,
-                    description = description,
-                    dueDate = dueDate,
-                    priority = priority,
-                    isDone = false
+        viewModelScope.launch {
+            if (taskId != null) {
+                val existing = find(taskId)
+                if (existing != null) {
+                    repository.updateTask(
+                        existing.copy(
+                            title = title,
+                            description = description,
+                            dueDate = dueDate,
+                            priority = priority
+                        )
+                    )
+                }
+            } else {
+                // the app owns the id, so a row keeps its identity wherever it travels
+                repository.addTask(
+                    Task(
+                        id = "t${nextNumber++}",
+                        title = title,
+                        description = description,
+                        dueDate = dueDate,
+                        priority = priority,
+                        isDone = false
+                    )
                 )
-            ) + tasks)
-        }
-        message = R.string.task_saved
-    }
-
-    private fun editInPlace(task: Task) {
-        val tasks = (state as? TaskUiState.Success)?.tasks ?: return
-        val index = tasks.indexOfFirst { it.id == task.id }
-        if (index >= 0) {
-            state = TaskUiState.Success(tasks.copyAt(index, task))
+            }
+            message = R.string.task_saved
+            load()
         }
     }
 }
