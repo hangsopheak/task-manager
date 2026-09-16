@@ -14,7 +14,10 @@ data class TaskEntity(
     val description: String,
     val dueDate: LocalDate,
     val priority: String,
-    val isDone: Boolean
+    val isDone: Boolean,
+    val placeLabel: String?,
+    val latitude: Double?,
+    val longitude: Double?
 )
 
 fun TaskEntity.toTask(): Task = Task(
@@ -23,7 +26,10 @@ fun TaskEntity.toTask(): Task = Task(
     description = description,
     dueDate = dueDate,
     priority = Priority.valueOf(priority),
-    isDone = isDone
+    isDone = isDone,
+    placeLabel = placeLabel,
+    latitude = latitude,
+    longitude = longitude
 )
 
 fun Task.toEntity(): TaskEntity = TaskEntity(
@@ -32,5 +38,8 @@ fun Task.toEntity(): TaskEntity = TaskEntity(
     description = description,
     dueDate = dueDate,
     priority = priority.name,
-    isDone = isDone
+    isDone = isDone,
+    placeLabel = placeLabel,
+    latitude = latitude,
+    longitude = longitude
 )

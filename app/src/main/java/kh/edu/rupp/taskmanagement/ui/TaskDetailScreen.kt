@@ -44,6 +44,8 @@ import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.notifications.hasNotificationPermission
+import kh.edu.rupp.taskmanagement.location.LocationProvider
+import kh.edu.rupp.taskmanagement.location.PlaceNamer
 import kh.edu.rupp.taskmanagement.notifications.TaskReminders
 import kh.edu.rupp.taskmanagement.notifications.needsRuntimeAsk
 import kh.edu.rupp.taskmanagement.notifications.shouldShowRationale
@@ -56,6 +58,7 @@ import kotlinx.coroutines.launch
 fun TaskDetailScreen(
     task: Task,
     onToggle: () -> Unit,
+    onSetPlace: (String?, Double?, Double?) -> Unit,
     onBack: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -66,6 +69,22 @@ fun TaskDetailScreen(
     var permissionNote by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val location = LocationProvider(context)
+
+    suspend fun savePlaceHere() {
+        val fix = location.currentFix()
+        if (fix == null) {
+            permissionNote = context.getString(R.string.place_not_found)
+            return
+        }
+        val label = PlaceNamer.label(context, fix)
+        onSetPlace(label, fix.latitude, fix.longitude)
+    }
+
+    fun takeFixAndSavePlace() {
+        scope.launch { savePlaceHere() }
+    }
+
     // the ask happens at the moment the user asked for something that needs it
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -73,6 +92,24 @@ fun TaskDetailScreen(
         if (granted) scope.launch { TaskReminders.post(context, task) }
         else permissionNote = context.getString(R.string.permission_denied)
     }
+    // two permissions asked together: coarse alone is enough to try
+    val placeLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        if (grants.values.any { it }) takeFixAndSavePlace()
+        else permissionNote = context.getString(R.string.permission_denied)
+    }
+
+    fun onSetPlacePressed() {
+        when {
+            location.hasPermission() -> takeFixAndSavePlace()
+            else -> placeLauncher.launch(arrayOf(
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ))
+        }
+    }
+
     fun onRemindMe() {
         when {
             !needsRuntimeAsk || hasNotificationPermission(context) -> scope.launch { TaskReminders.post(context, task) }
@@ -130,6 +167,7 @@ fun TaskDetailScreen(
             task = task,
             onToggle = onToggle,
             onRemindMe = { onRemindMe() },
+            onSetPlace = { onSetPlacePressed() },
             permissionNote = permissionNote,
             modifier = Modifier
                 .padding(innerPadding)
@@ -153,12 +191,21 @@ fun TaskDetailContent(
     task: Task,
     onToggle: () -> Unit,
     onRemindMe: () -> Unit = {},
+    onSetPlace: () -> Unit = {},
     permissionNote: String? = null,
     modifier: Modifier = Modifier
 ) {
     val doneLabel = stringResource(R.string.task_done)
     Column(modifier.fillMaxSize()) {
         Text(task.title, style = MaterialTheme.typography.headlineSmall)
+        task.placeLabel?.let { place ->
+            Text(
+                stringResource(R.string.task_place, place),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        }
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
@@ -186,6 +233,14 @@ fun TaskDetailContent(
             modifier = Modifier.widthIn(max = 640.dp)
         )
         Spacer(Modifier.weight(1f))
+        OutlinedButton(
+            onClick = onSetPlace,
+            modifier = Modifier
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.set_place))
+        }
         OutlinedButton(
             onClick = { onRemindMe() },
             modifier = Modifier
@@ -239,6 +294,6 @@ fun TaskDetailContent(
 @Composable
 fun TaskDetailScreenPreview() {
     TaskManagerTheme {
-        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {}, onDelete = {})
+        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onSetPlace = { _, _, _ -> }, onBack = {}, onEdit = {}, onDelete = {})
     }
 }

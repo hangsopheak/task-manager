@@ -93,6 +93,7 @@ fun TaskNavHost(vm: TaskViewModel, openTaskId: String? = null) {
                     TaskDetailScreen(
                         task = task,
                         onToggle = { vm.toggle(task) },
+                        onSetPlace = { label, lat, lng -> vm.setPlace(task.id, label, lat, lng) },
                         onBack = { nav.popBackStack() },
                         onEdit = { nav.navigate(Routes.edit(task.id)) },
                         onDelete = {

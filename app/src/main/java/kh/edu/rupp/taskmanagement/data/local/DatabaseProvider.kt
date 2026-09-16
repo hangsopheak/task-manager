@@ -14,6 +14,8 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "task-manager.db"
-            ).build().also { instance = it }
+            )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build().also { instance = it }
         }
 }

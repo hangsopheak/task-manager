@@ -122,6 +122,10 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
             ?.map { it.title }
             ?: emptyList()
 
+    fun setPlace(taskId: String, label: String?, latitude: Double?, longitude: Double?) {
+        viewModelScope.launch { repository.setPlace(taskId, label, latitude, longitude) }
+    }
+
     fun toggle(task: Task) {
         viewModelScope.launch {
             repository.updateTask(task.copy(isDone = !task.isDone))

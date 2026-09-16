@@ -35,6 +35,10 @@ class TaskRepository(private val dao: TaskDao) {
         saved
     }
 
+    suspend fun setPlace(taskId: String, label: String?, latitude: Double?, longitude: Double?) {
+        dao.setPlace(taskId, label, latitude, longitude)
+    }
+
     suspend fun deleteTask(taskId: String): Result<Unit> = runCatching {
         taskApi.deleteTask(taskId)
         dao.deleteById(taskId)

@@ -81,4 +81,7 @@
     <string name="permission_denied">Reminders are off. Allow notifications for this app in Settings.</string>
     <string name="channel_name">Task reminders</string>
     <string name="reminder_title">Reminder</string>
+    <string name="set_place">Set place</string>
+    <string name="place_not_found">No location available. Try again.</string>
+    <string name="task_place">Place: %1</string>
 </resources>
