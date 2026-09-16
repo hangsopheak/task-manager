@@ -13,11 +13,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // a tap on a reminder arrives here, carrying which task it was about
+        val openTaskId = intent?.data?.lastPathSegment
         setContent {
             val vm: TaskViewModel = viewModel()
             TaskManagerTheme(themeChoice = vm.themeChoice) {
                 // one activity holds the graph, and every screen inside it is a composable
-                TaskNavHost(vm = vm)
+                TaskNavHost(vm = vm, openTaskId = openTaskId)
             }
         }
     }

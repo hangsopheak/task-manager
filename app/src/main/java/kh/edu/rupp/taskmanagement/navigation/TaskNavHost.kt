@@ -28,8 +28,12 @@ import kh.edu.rupp.taskmanagement.ui.TaskViewModel
 import kh.edu.rupp.taskmanagement.ui.components.LoadingView
 
 @Composable
-fun TaskNavHost(vm: TaskViewModel) {
+fun TaskNavHost(vm: TaskViewModel, openTaskId: String? = null) {
     val nav = rememberNavController()
+    LaunchedEffect(openTaskId) {
+        // the reminder tap is answered once, then forgotten
+        if (openTaskId != null) nav.navigate(Routes.detail(openTaskId))
+    }
     val loginVm: LoginViewModel = viewModel()
     LaunchedEffect(Unit) { vm.refresh() }
     val entry by nav.currentBackStackEntryAsState()

@@ -2,9 +2,13 @@ package kh.edu.rupp.taskmanagement.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import kh.edu.rupp.taskmanagement.R
+import kh.edu.rupp.taskmanagement.MainActivity
 import kh.edu.rupp.taskmanagement.model.Task
 
 object TaskReminders {
@@ -21,14 +25,26 @@ object TaskReminders {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
-    // the reminder itself: the task title, on the channel the user controls
+    // the tap carries the task id, so the app lands on the task the reminder is about
     fun post(context: Context, task: Task) {
         if (!hasNotificationPermission(context)) return
+
+        val openTask = Intent(context, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = Uri.parse("task://${task.id}")
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            task.id.hashCode(),
+            openTask,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.reminder_title))
             .setContentText(task.title)
+            .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
 
