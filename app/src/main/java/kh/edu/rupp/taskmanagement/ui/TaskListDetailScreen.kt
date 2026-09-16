@@ -21,6 +21,7 @@ import kh.edu.rupp.taskmanagement.ui.TaskUiState
 @Composable
 fun TaskListDetailScreen(
     state: TaskUiState,
+    onRefresh: () -> Unit,
     onRetry: () -> Unit,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
@@ -34,6 +35,7 @@ fun TaskListDetailScreen(
     Row(modifier.fillMaxSize()) {
         TaskListScreen(
             state = state,
+            onRefresh = onRefresh,
             onRetry = onRetry,
             onToggle = onToggle,
             onAdd = onAdd,

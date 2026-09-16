@@ -33,7 +33,7 @@ fun TaskNavHost() {
     // one view model above the graph, so every screen reads and changes the same state
     val vm: TaskViewModel = viewModel()
     val loginVm: LoginViewModel = viewModel()
-    LaunchedEffect(Unit) { vm.load() }
+    LaunchedEffect(Unit) { vm.refresh() }
     val entry by nav.currentBackStackEntryAsState()
     val currentRoute = entry?.destination?.route
     AppShell(
@@ -65,7 +65,8 @@ fun TaskNavHost() {
                 if (isWideScreen()) {
                     TaskListDetailScreen(
                         state = vm.state,
-                        onRetry = { vm.load() },
+                        onRefresh = { vm.refresh() },
+                        onRetry = { vm.refresh() },
                         onToggle = { vm.toggle(it) },
                         onAdd = { nav.navigate(Routes.ADD) },
                         message = vm.message,
@@ -74,7 +75,8 @@ fun TaskNavHost() {
                 } else {
                     TaskListScreen(
                         state = vm.state,
-                        onRetry = { vm.load() },
+                        onRefresh = { vm.refresh() },
+                        onRetry = { vm.refresh() },
                         onToggle = { vm.toggle(it) },
                         onAdd = { nav.navigate(Routes.ADD) },
                         onTaskClick = { taskId -> nav.navigate(Routes.detail(taskId)) },
@@ -129,7 +131,7 @@ fun TaskNavHost() {
                 }
             }
             composable(Routes.STATS) {
-                StatsScreen(vm.state, onRetry = { vm.load() })
+                StatsScreen(vm.state, onRetry = { vm.refresh() })
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen(

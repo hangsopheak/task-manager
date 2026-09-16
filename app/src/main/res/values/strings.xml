@@ -70,4 +70,5 @@
     <string name="login_error_network">No connection. Check the network and try again.</string>
     <string name="login_error_other">Something went wrong. Try again.</string>
     <string name="settings_sign_out">Sign out</string>
+    <string name="refresh">Refresh</string>
 </resources>

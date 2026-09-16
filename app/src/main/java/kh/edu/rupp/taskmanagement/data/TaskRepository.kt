@@ -16,19 +16,27 @@ class TaskRepository(private val dao: TaskDao) {
     fun observeTasks(): Flow<List<Task>> =
         dao.observeTasks().map { rows -> rows.map { it.taskFromRow() } }
 
-    suspend fun getTasks(): Result<List<Task>> = runCatching {
-        taskApi.getTasks().map { it.toTask() }
+    // the network is the origin of the data, Room is the copy the screen reads
+    suspend fun refresh(): Result<List<Task>> = runCatching {
+        val tasks = taskApi.getTasks().map { it.toTask() }
+        dao.upsertAll(tasks.map { it.toEntity() })
+        tasks
     }
 
     suspend fun addTask(task: Task): Result<Task> = runCatching {
-        taskApi.createTask(task.toDto()).toTask()
+        val saved = taskApi.createTask(task.toDto()).toTask()
+        dao.insert(saved.toEntity())
+        saved
     }
 
     suspend fun updateTask(task: Task): Result<Task> = runCatching {
-        taskApi.updateTask(task.id, task.toDto()).toTask()
+        val saved = taskApi.updateTask(task.id, task.toDto()).toTask()
+        dao.insert(saved.toEntity())
+        saved
     }
 
     suspend fun deleteTask(taskId: String): Result<Unit> = runCatching {
         taskApi.deleteTask(taskId)
+        dao.deleteById(taskId)
     }
 }

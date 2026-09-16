@@ -10,7 +10,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -39,6 +43,7 @@ import kh.edu.rupp.taskmanagement.ui.components.LoadingView
 @Composable
 fun TaskListScreen(
     state: TaskUiState,
+    onRefresh: () -> Unit,
     onRetry: () -> Unit,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
@@ -54,6 +59,7 @@ fun TaskListScreen(
         is TaskUiState.Error -> ErrorView(onRetry = onRetry, message = state.message, modifier = modifier)
         is TaskUiState.Success -> TaskListContent(
             tasks = state.tasks,
+            onRefresh = onRefresh,
             onToggle = onToggle,
             onAdd = onAdd,
             onTaskClick = onTaskClick,
@@ -68,6 +74,7 @@ fun TaskListScreen(
 @Composable
 private fun TaskListContent(
     tasks: List<Task>,
+    onRefresh: () -> Unit,
     onToggle: (Task) -> Unit,
     onAdd: () -> Unit,
     onTaskClick: (String) -> Unit,
@@ -99,7 +106,17 @@ private fun TaskListContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.app_name)) })
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = onRefresh) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.refresh)
+                        )
+                    }
+                }
+            )
         },
         snackbarHost = {
             // the bar is on screen for as long as there is something to say and no longer

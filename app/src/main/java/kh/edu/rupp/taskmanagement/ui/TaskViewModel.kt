@@ -41,13 +41,12 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
     // an id is handed out once and never used again, so two rows can never share one
     private var nextNumber = 9
 
-    fun load() {
+    // a relaunch is no longer the refresh: this is
+    fun refresh() {
         viewModelScope.launch {
-            state = TaskUiState.Loading
-            repository.getTasks()
+            repository.refresh()
                 .onSuccess { tasks ->
                     nextNumber = tasks.size + 1
-                    state = if (tasks.isEmpty()) TaskUiState.Empty else TaskUiState.Success(tasks)
                 }
                 .onFailure { error ->
                     state = TaskUiState.Error(error.message ?: "Could not reach the server")
@@ -69,7 +68,7 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
     fun toggle(task: Task) {
         viewModelScope.launch {
             repository.updateTask(task.copy(isDone = !task.isDone))
-            load()
+            refresh()
         }
     }
 
@@ -77,7 +76,7 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             repository.deleteTask(task.id)
             message = R.string.task_deleted
-            load()
+            refresh()
         }
     }
 
@@ -110,7 +109,7 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }
             message = R.string.task_saved
-            load()
+            refresh()
         }
     }
 }
