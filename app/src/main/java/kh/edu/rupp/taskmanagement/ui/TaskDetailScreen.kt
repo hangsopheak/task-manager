@@ -43,6 +43,7 @@ import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.notifications.hasNotificationPermission
+import kh.edu.rupp.taskmanagement.notifications.TaskReminders
 import kh.edu.rupp.taskmanagement.notifications.needsRuntimeAsk
 import kh.edu.rupp.taskmanagement.notifications.shouldShowRationale
 import kh.edu.rupp.taskmanagement.ui.components.ConfirmDeleteDialog
@@ -66,11 +67,12 @@ fun TaskDetailScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        permissionNote = if (granted) null else context.getString(R.string.permission_denied)
+        if (granted) TaskReminders.post(context, task)
+        else permissionNote = context.getString(R.string.permission_denied)
     }
     fun onRemindMe() {
         when {
-            !needsRuntimeAsk || hasNotificationPermission(context) -> permissionNote = null
+            !needsRuntimeAsk || hasNotificationPermission(context) -> TaskReminders.post(context, task)
             else -> permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
     }
