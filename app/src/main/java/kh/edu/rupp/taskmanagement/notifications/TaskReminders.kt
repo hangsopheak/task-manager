@@ -9,7 +9,9 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.MainActivity
+import kh.edu.rupp.taskmanagement.data.prefs.UserPrefs
 import kh.edu.rupp.taskmanagement.model.Task
+import kotlinx.coroutines.flow.first
 
 object TaskReminders {
     const val CHANNEL_ID = "task_reminders"

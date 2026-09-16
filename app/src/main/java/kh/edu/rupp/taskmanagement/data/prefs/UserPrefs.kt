@@ -1,6 +1,7 @@
 package kh.edu.rupp.taskmanagement.data.prefs
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,6 +22,9 @@ class UserPrefs(context: Context) {
     val themeChoice: Flow<ThemeChoice> = store.data
         .map { prefs -> ThemeChoice.valueOf(prefs[THEME_KEY] ?: ThemeChoice.SYSTEM.name) }
 
+    val remindersEnabled: Flow<Boolean> = store.data
+        .map { prefs -> prefs[REMINDERS_KEY] ?: true }
+
     suspend fun setSortOrder(order: SortOrder) {
         store.edit { it[SORT_KEY] = order.name }
     }
@@ -29,8 +33,13 @@ class UserPrefs(context: Context) {
         store.edit { it[THEME_KEY] = choice.name }
     }
 
+    suspend fun setRemindersEnabled(enabled: Boolean) {
+        store.edit { it[REMINDERS_KEY] = enabled }
+    }
+
     private companion object {
         val SORT_KEY = stringPreferencesKey("sort_order")
         val THEME_KEY = stringPreferencesKey("theme_choice")
+        val REMINDERS_KEY = booleanPreferencesKey("reminders_enabled")
     }
 }

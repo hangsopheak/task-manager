@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.ui.components.SettingsRadioRow
 import kh.edu.rupp.taskmanagement.ui.components.SettingsSectionLabel
+import kh.edu.rupp.taskmanagement.ui.components.SwitchRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +30,8 @@ fun SettingsScreen(
     onSortChange: (SortOrder) -> Unit,
     themeChoice: ThemeChoice,
     onThemeChange: (ThemeChoice) -> Unit,
+    remindersEnabled: Boolean,
+    onRemindersChange: (Boolean) -> Unit,
     email: String,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
@@ -53,7 +56,7 @@ fun SettingsScreen(
             SettingsRadioRow(R.string.settings_theme_light, themeChoice == ThemeChoice.LIGHT) { onThemeChange(ThemeChoice.LIGHT) }
             SettingsRadioRow(R.string.settings_theme_dark, themeChoice == ThemeChoice.DARK) { onThemeChange(ThemeChoice.DARK) }
             SettingsSectionLabel(R.string.settings_reminders)
-            SettingRow(R.string.settings_reminders, 11)
+            SwitchRow(R.string.settings_reminders, remindersEnabled, onRemindersChange)
             SettingsSectionLabel(R.string.settings_account)
             AccountSection(email = email, onSignOut = onSignOut)
         }

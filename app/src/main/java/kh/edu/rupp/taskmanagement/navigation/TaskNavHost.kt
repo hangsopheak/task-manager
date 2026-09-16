@@ -141,6 +141,8 @@ fun TaskNavHost(vm: TaskViewModel, openTaskId: String? = null) {
                     onSortChange = { vm.chooseSortOrder(it) },
                     themeChoice = vm.themeChoice,
                     onThemeChange = { vm.chooseTheme(it) },
+                    remindersEnabled = vm.remindersEnabled,
+                    onRemindersChange = { vm.chooseReminders(it) },
                     email = loginVm.userEmail,
                     onSignOut = {
                         loginVm.signOut()

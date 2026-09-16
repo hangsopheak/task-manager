@@ -27,6 +27,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ import kh.edu.rupp.taskmanagement.notifications.needsRuntimeAsk
 import kh.edu.rupp.taskmanagement.notifications.shouldShowRationale
 import kh.edu.rupp.taskmanagement.ui.components.ConfirmDeleteDialog
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,16 +65,17 @@ fun TaskDetailScreen(
     var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
     var permissionNote by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     // the ask happens at the moment the user asked for something that needs it
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) TaskReminders.post(context, task)
+        if (granted) scope.launch { TaskReminders.post(context, task) }
         else permissionNote = context.getString(R.string.permission_denied)
     }
     fun onRemindMe() {
         when {
-            !needsRuntimeAsk || hasNotificationPermission(context) -> TaskReminders.post(context, task)
+            !needsRuntimeAsk || hasNotificationPermission(context) -> scope.launch { TaskReminders.post(context, task) }
             else -> permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
     }

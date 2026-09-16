@@ -30,6 +30,9 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
     var themeChoice by mutableStateOf(ThemeChoice.SYSTEM)
         private set
 
+    var remindersEnabled by mutableStateOf(true)
+        private set
+
     private var currentTasks: List<Task> = emptyList()
 
     init {
@@ -49,6 +52,11 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             prefs.themeChoice.collect { choice ->
                 themeChoice = choice
+            }
+        }
+        viewModelScope.launch {
+            prefs.remindersEnabled.collect { enabled ->
+                remindersEnabled = enabled
             }
         }
     }
@@ -73,6 +81,10 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
 
     fun chooseTheme(choice: ThemeChoice) {
         viewModelScope.launch { prefs.setThemeChoice(choice) }
+    }
+
+    fun chooseReminders(enabled: Boolean) {
+        viewModelScope.launch { prefs.setRemindersEnabled(enabled) }
     }
 
     // the one sentence to show the user, kept as a string id so it can be translated
