@@ -52,4 +52,31 @@ object TaskReminders {
 
         context.getSystemService(NotificationManager::class.java).notify(REMINDER_ID, notification)
     }
+
+    // the same reminder, fired once when the phone is close enough to the place
+    suspend fun postArrival(context: Context, task: Task) {
+        if (!UserPrefs(context).remindersEnabled.first()) return
+        if (!hasNotificationPermission(context)) return
+
+        val openTask = Intent(context, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = Uri.parse("task://${task.id}")
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            task.id.hashCode(),
+            openTask,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.reminder_title))
+            .setContentText(context.getString(R.string.arrival_text, task.title))
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        context.getSystemService(NotificationManager::class.java).notify(REMINDER_ID + 1, notification)
+    }
 }

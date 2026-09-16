@@ -85,4 +85,5 @@
     <string name="place_not_found">No location available. Try again.</string>
     <string name="task_place">Place: %1$s</string>
     <string name="distance_remaining">About %1$d m away</string>
+    <string name="arrival_text">You are close to: %1$s</string>
 </resources>

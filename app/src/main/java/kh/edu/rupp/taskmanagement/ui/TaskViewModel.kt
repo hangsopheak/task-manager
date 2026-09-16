@@ -13,6 +13,7 @@ import kh.edu.rupp.taskmanagement.data.local.DatabaseProvider
 import android.location.Location
 import kh.edu.rupp.taskmanagement.data.prefs.UserPrefs
 import kh.edu.rupp.taskmanagement.location.LocationProvider
+import kh.edu.rupp.taskmanagement.notifications.TaskReminders
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import java.time.LocalDate
@@ -42,6 +43,7 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     private var watchJob: Job? = null
+    private var arrivalPosted = false
 
     private var currentTasks: List<Task> = emptyList()
 
@@ -108,6 +110,10 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
     // an id is handed out once and never used again, so two rows can never share one
     private var nextNumber = 9
 
+    private companion object {
+        const val ARRIVAL_METERS = 100
+    }
+
     // a relaunch is no longer the refresh: this is
     fun refresh() {
         viewModelScope.launch {
@@ -135,11 +141,18 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
     fun watchTask(task: Task) {
         watchJob?.cancel()
         distanceMeters = null
+        arrivalPosted = false
         val latitude = task.latitude ?: return
         val longitude = task.longitude ?: return
         watchJob = viewModelScope.launch {
             location.updates().collect { fix ->
-                distanceMeters = distanceToPlace(fix, latitude, longitude)
+                val meters = distanceToPlace(fix, latitude, longitude)
+                distanceMeters = meters
+                // post once, not on every update: that is the bug everyone writes first
+                if (meters <= ARRIVAL_METERS && !arrivalPosted) {
+                    arrivalPosted = true
+                    TaskReminders.postArrival(getApplication(), task)
+                }
             }
         }
     }
