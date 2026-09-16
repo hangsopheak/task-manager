@@ -1,6 +1,8 @@
 package kh.edu.rupp.taskmanagement.ui
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -39,6 +42,9 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.notifications.hasNotificationPermission
+import kh.edu.rupp.taskmanagement.notifications.needsRuntimeAsk
+import kh.edu.rupp.taskmanagement.notifications.shouldShowRationale
 import kh.edu.rupp.taskmanagement.ui.components.ConfirmDeleteDialog
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
@@ -54,7 +60,20 @@ fun TaskDetailScreen(
 ) {
     // whether the question is on screen is this screen's business and nobody else's
     var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
+    var permissionNote by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    // the ask happens at the moment the user asked for something that needs it
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        permissionNote = if (granted) null else context.getString(R.string.permission_denied)
+    }
+    fun onRemindMe() {
+        when {
+            !needsRuntimeAsk || hasNotificationPermission(context) -> permissionNote = null
+            else -> permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
     val shareText = stringResource(R.string.share_task_text, task.title, dueDateText(task.dueDate))
     val chooserTitle = stringResource(R.string.share_chooser_title)
     Scaffold(
@@ -105,6 +124,8 @@ fun TaskDetailScreen(
         TaskDetailContent(
             task = task,
             onToggle = onToggle,
+            onRemindMe = { onRemindMe() },
+            permissionNote = permissionNote,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
@@ -126,6 +147,8 @@ fun TaskDetailScreen(
 fun TaskDetailContent(
     task: Task,
     onToggle: () -> Unit,
+    onRemindMe: () -> Unit = {},
+    permissionNote: String? = null,
     modifier: Modifier = Modifier
 ) {
     val doneLabel = stringResource(R.string.task_done)
@@ -158,6 +181,25 @@ fun TaskDetailContent(
             modifier = Modifier.widthIn(max = 640.dp)
         )
         Spacer(Modifier.weight(1f))
+        OutlinedButton(
+            onClick = { onRemindMe() },
+            modifier = Modifier
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.remind_me))
+        }
+        permissionNote?.let { note ->
+            Text(
+                note,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .padding(top = 4.dp)
+            )
+        }
+        Spacer(Modifier.height(16.dp))
         // the caps do nothing on a phone and stop a wide pane stretching the row
         Card(
             modifier = Modifier

@@ -4,6 +4,8 @@
 
     <!-- the server is on Vercel over HTTPS, so no cleartext exception is needed -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- reminders need this from Android 13; below that the app posts without asking -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"

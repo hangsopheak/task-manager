@@ -77,4 +77,6 @@
     <string name="settings_theme_system">Follow the system</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="remind_me">Remind me</string>
+    <string name="permission_denied">Reminders are off. Allow notifications for this app in Settings.</string>
 </resources>
