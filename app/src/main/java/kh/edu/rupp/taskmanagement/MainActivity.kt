@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kh.edu.rupp.taskmanagement.navigation.TaskNavHost
+import kh.edu.rupp.taskmanagement.ui.TaskViewModel
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,9 +14,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TaskManagerTheme {
+            val vm: TaskViewModel = viewModel()
+            TaskManagerTheme(themeChoice = vm.themeChoice) {
                 // one activity holds the graph, and every screen inside it is a composable
-                TaskNavHost()
+                TaskNavHost(vm = vm)
             }
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import kh.edu.rupp.taskmanagement.ui.ThemeChoice
 
 private val LightColors = lightColorScheme(
     primary = Blue25,
@@ -74,8 +75,16 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun TaskManagerTheme(content: @Composable () -> Unit) {
-    val darkTheme = isSystemInDarkTheme()
+fun TaskManagerTheme(
+    themeChoice: ThemeChoice = ThemeChoice.SYSTEM,
+    content: @Composable () -> Unit
+) {
+    // the choice overrides the phone only when the user made one
+    val darkTheme = when (themeChoice) {
+        ThemeChoice.SYSTEM -> isSystemInDarkTheme()
+        ThemeChoice.LIGHT -> false
+        ThemeChoice.DARK -> true
+    }
     val context = LocalContext.current
     val colorScheme = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->

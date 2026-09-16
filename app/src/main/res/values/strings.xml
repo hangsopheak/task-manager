@@ -71,4 +71,10 @@
     <string name="login_error_other">Something went wrong. Try again.</string>
     <string name="settings_sign_out">Sign out</string>
     <string name="refresh">Refresh</string>
+    <string name="settings_sort_due_date">Due date</string>
+    <string name="settings_sort_priority">Priority</string>
+    <string name="settings_sort_title">Title</string>
+    <string name="settings_theme_system">Follow the system</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
 </resources>

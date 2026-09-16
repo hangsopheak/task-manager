@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.TaskRepository
 import kh.edu.rupp.taskmanagement.data.local.DatabaseProvider
+import kh.edu.rupp.taskmanagement.data.prefs.UserPrefs
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import java.time.LocalDate
@@ -17,17 +18,61 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel(app: Application) : AndroidViewModel(app) {
     private val repository = TaskRepository(DatabaseProvider.get(app).taskDao())
+    private val prefs = UserPrefs(app)
 
     var state by mutableStateOf<TaskUiState>(TaskUiState.Loading)
         private set
+
+    // two settings, one store: one reorders the list, the other repaints the app
+    var sortOrder by mutableStateOf(SortOrder.DUE_DATE)
+        private set
+
+    var themeChoice by mutableStateOf(ThemeChoice.SYSTEM)
+        private set
+
+    private var currentTasks: List<Task> = emptyList()
 
     init {
         // the list on screen is whatever Room has, the moment Room has it
         viewModelScope.launch {
             repository.observeTasks().collect { tasks ->
-                state = if (tasks.isEmpty()) TaskUiState.Empty else TaskUiState.Success(tasks)
+                currentTasks = tasks
+                publish()
             }
         }
+        viewModelScope.launch {
+            prefs.sortOrder.collect { order ->
+                sortOrder = order
+                publish()
+            }
+        }
+        viewModelScope.launch {
+            prefs.themeChoice.collect { choice ->
+                themeChoice = choice
+            }
+        }
+    }
+
+    private fun publish() {
+        state = if (currentTasks.isEmpty()) {
+            TaskUiState.Empty
+        } else {
+            TaskUiState.Success(sorted(currentTasks))
+        }
+    }
+
+    private fun sorted(tasks: List<Task>): List<Task> = when (sortOrder) {
+        SortOrder.DUE_DATE -> tasks.sortedBy { it.dueDate }
+        SortOrder.PRIORITY -> tasks.sortedByDescending { it.priority.ordinal }
+        SortOrder.TITLE -> tasks.sortedBy { it.title.lowercase() }
+    }
+
+    fun chooseSortOrder(order: SortOrder) {
+        viewModelScope.launch { prefs.setSortOrder(order) }
+    }
+
+    fun chooseTheme(choice: ThemeChoice) {
+        viewModelScope.launch { prefs.setThemeChoice(choice) }
     }
 
     // the one sentence to show the user, kept as a string id so it can be translated

@@ -19,10 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
+import kh.edu.rupp.taskmanagement.ui.components.SettingsRadioRow
+import kh.edu.rupp.taskmanagement.ui.components.SettingsSectionLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    sortOrder: SortOrder,
+    onSortChange: (SortOrder) -> Unit,
+    themeChoice: ThemeChoice,
+    onThemeChange: (ThemeChoice) -> Unit,
     email: String,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
@@ -38,16 +44,17 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Text(
-                stringResource(R.string.settings_coming_later).uppercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
-            )
-            // one row per setting that is coming, so later sessions have a home to fill in
-            SettingRow(R.string.settings_sort_order, 10)
-            SettingRow(R.string.settings_theme, 10)
+            SettingsSectionLabel(R.string.settings_sort_order)
+            SettingsRadioRow(R.string.settings_sort_due_date, sortOrder == SortOrder.DUE_DATE) { onSortChange(SortOrder.DUE_DATE) }
+            SettingsRadioRow(R.string.settings_sort_priority, sortOrder == SortOrder.PRIORITY) { onSortChange(SortOrder.PRIORITY) }
+            SettingsRadioRow(R.string.settings_sort_title, sortOrder == SortOrder.TITLE) { onSortChange(SortOrder.TITLE) }
+            SettingsSectionLabel(R.string.settings_theme)
+            SettingsRadioRow(R.string.settings_theme_system, themeChoice == ThemeChoice.SYSTEM) { onThemeChange(ThemeChoice.SYSTEM) }
+            SettingsRadioRow(R.string.settings_theme_light, themeChoice == ThemeChoice.LIGHT) { onThemeChange(ThemeChoice.LIGHT) }
+            SettingsRadioRow(R.string.settings_theme_dark, themeChoice == ThemeChoice.DARK) { onThemeChange(ThemeChoice.DARK) }
+            SettingsSectionLabel(R.string.settings_reminders)
             SettingRow(R.string.settings_reminders, 11)
+            SettingsSectionLabel(R.string.settings_account)
             AccountSection(email = email, onSignOut = onSignOut)
         }
     }

@@ -28,10 +28,8 @@ import kh.edu.rupp.taskmanagement.ui.TaskViewModel
 import kh.edu.rupp.taskmanagement.ui.components.LoadingView
 
 @Composable
-fun TaskNavHost() {
+fun TaskNavHost(vm: TaskViewModel) {
     val nav = rememberNavController()
-    // one view model above the graph, so every screen reads and changes the same state
-    val vm: TaskViewModel = viewModel()
     val loginVm: LoginViewModel = viewModel()
     LaunchedEffect(Unit) { vm.refresh() }
     val entry by nav.currentBackStackEntryAsState()
@@ -135,6 +133,10 @@ fun TaskNavHost() {
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen(
+                    sortOrder = vm.sortOrder,
+                    onSortChange = { vm.chooseSortOrder(it) },
+                    themeChoice = vm.themeChoice,
+                    onThemeChange = { vm.chooseTheme(it) },
                     email = loginVm.userEmail,
                     onSignOut = {
                         loginVm.signOut()
