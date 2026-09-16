@@ -3,19 +3,32 @@ package kh.edu.rupp.taskmanagement.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.TaskRepository
+import kh.edu.rupp.taskmanagement.data.local.DatabaseProvider
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
-class TaskViewModel(private val repository: TaskRepository = TaskRepository()) : ViewModel() {
+class TaskViewModel(app: Application) : AndroidViewModel(app) {
+    private val repository = TaskRepository(DatabaseProvider.get(app).taskDao())
 
     var state by mutableStateOf<TaskUiState>(TaskUiState.Loading)
         private set
+
+    init {
+        // the list on screen is whatever Room has, the moment Room has it
+        viewModelScope.launch {
+            repository.observeTasks().collect { tasks ->
+                state = if (tasks.isEmpty()) TaskUiState.Empty else TaskUiState.Success(tasks)
+            }
+        }
+    }
 
     // the one sentence to show the user, kept as a string id so it can be translated
     var message by mutableStateOf<Int?>(null)

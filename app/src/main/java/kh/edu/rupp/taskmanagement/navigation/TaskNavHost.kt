@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import kh.edu.rupp.taskmanagement.R
+import kh.edu.rupp.taskmanagement.data.local.DatabaseProvider
 import kh.edu.rupp.taskmanagement.ui.AppShell
 import kh.edu.rupp.taskmanagement.ui.LoginScreen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
