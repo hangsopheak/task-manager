@@ -36,4 +36,24 @@ class LocationProvider(private val context: Context) {
             null
         }
     }
+
+    // a stream that runs as long as somebody collects it: register, read, unregister
+    @SuppressLint("MissingPermission")
+    fun updates(): Flow<Location> = callbackFlow {
+        if (!hasPermission()) {
+            close()
+            return@callbackFlow
+        }
+        val request = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            5_000L
+        ).build()
+        val callback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                result.lastLocation?.let { trySend(it) }
+            }
+        }
+        client.requestLocationUpdates(request, callback, context.mainLooper)
+        awaitClose { client.removeLocationUpdates(callback) }
+    }
 }

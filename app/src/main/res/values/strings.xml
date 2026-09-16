@@ -83,5 +83,6 @@
     <string name="reminder_title">Reminder</string>
     <string name="set_place">Set place</string>
     <string name="place_not_found">No location available. Try again.</string>
-    <string name="task_place">Place: %1</string>
+    <string name="task_place">Place: %1$s</string>
+    <string name="distance_remaining">About %1$d m away</string>
 </resources>

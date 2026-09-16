@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,6 +61,9 @@ fun TaskDetailScreen(
     task: Task,
     onToggle: () -> Unit,
     onSetPlace: (String?, Double?, Double?) -> Unit,
+    distanceMeters: Int? = null,
+    onStartWatching: () -> Unit = {},
+    onStopWatching: () -> Unit = {},
     onBack: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -168,11 +173,17 @@ fun TaskDetailScreen(
             onToggle = onToggle,
             onRemindMe = { onRemindMe() },
             onSetPlace = { onSetPlacePressed() },
+            distanceMeters = distanceMeters,
             permissionNote = permissionNote,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
         )
+        // the watching runs exactly as long as this screen is on screen
+        LaunchedEffect(task.id) { onStartWatching() }
+        DisposableEffect(Unit) {
+            onDispose { onStopWatching() }
+        }
         if (isDeleteAsked) {
             ConfirmDeleteDialog(
                 onConfirm = {
@@ -192,6 +203,7 @@ fun TaskDetailContent(
     onToggle: () -> Unit,
     onRemindMe: () -> Unit = {},
     onSetPlace: () -> Unit = {},
+    distanceMeters: Int? = null,
     permissionNote: String? = null,
     modifier: Modifier = Modifier
 ) {
@@ -205,6 +217,14 @@ fun TaskDetailContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 2.dp)
             )
+            distanceMeters?.let { meters ->
+                Text(
+                    stringResource(R.string.distance_remaining, meters),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
         }
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

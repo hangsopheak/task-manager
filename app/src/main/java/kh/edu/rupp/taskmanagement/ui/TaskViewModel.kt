@@ -10,15 +10,19 @@ import androidx.lifecycle.viewModelScope
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.TaskRepository
 import kh.edu.rupp.taskmanagement.data.local.DatabaseProvider
+import android.location.Location
 import kh.edu.rupp.taskmanagement.data.prefs.UserPrefs
+import kh.edu.rupp.taskmanagement.location.LocationProvider
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import java.time.LocalDate
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class TaskViewModel(app: Application) : AndroidViewModel(app) {
     private val repository = TaskRepository(DatabaseProvider.get(app).taskDao())
     private val prefs = UserPrefs(app)
+    private val location = LocationProvider(app)
 
     var state by mutableStateOf<TaskUiState>(TaskUiState.Loading)
         private set
@@ -32,6 +36,12 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
 
     var remindersEnabled by mutableStateOf(true)
         private set
+
+    // how far the phone is from the watched task, while its screen is open
+    var distanceMeters by mutableStateOf<Int?>(null)
+        private set
+
+    private var watchJob: Job? = null
 
     private var currentTasks: List<Task> = emptyList()
 
@@ -121,6 +131,30 @@ class TaskViewModel(app: Application) : AndroidViewModel(app) {
             ?.filter { it.id != excludeId }
             ?.map { it.title }
             ?: emptyList()
+
+    fun watchTask(task: Task) {
+        watchJob?.cancel()
+        distanceMeters = null
+        val latitude = task.latitude ?: return
+        val longitude = task.longitude ?: return
+        watchJob = viewModelScope.launch {
+            location.updates().collect { fix ->
+                distanceMeters = distanceToPlace(fix, latitude, longitude)
+            }
+        }
+    }
+
+    fun stopWatching() {
+        watchJob?.cancel()
+        watchJob = null
+        distanceMeters = null
+    }
+
+    private fun distanceToPlace(fix: Location, latitude: Double, longitude: Double): Int {
+        val results = FloatArray(1)
+        Location.distanceBetween(fix.latitude, fix.longitude, latitude, longitude, results)
+        return results[0].toInt()
+    }
 
     fun setPlace(taskId: String, label: String?, latitude: Double?, longitude: Double?) {
         viewModelScope.launch { repository.setPlace(taskId, label, latitude, longitude) }
