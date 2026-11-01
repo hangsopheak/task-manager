@@ -22,6 +22,7 @@ import kh.edu.rupp.taskmanagement.data.TaskStore
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.ui.AppScaffold
 import kh.edu.rupp.taskmanagement.ui.CalendarScreen
+import kh.edu.rupp.taskmanagement.ui.LoginScreen
 import kh.edu.rupp.taskmanagement.ui.NoTaskOpen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
@@ -34,7 +35,7 @@ import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 @Composable
 fun TaskNavigation() {
     // saved across a rotation, because every key on it is @Serializable
-    val backStack = rememberNavBackStack(TaskList)
+    val backStack = rememberNavBackStack(Login)
     // a plain remember, so the tasks start again after a rotation
     val store = remember { TaskStore(sampleTasks) }
     // on a wide window it shows a list entry and a detail entry side by side as one scene
@@ -50,6 +51,13 @@ fun TaskNavigation() {
         transitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
         popTransitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
         entryProvider = entryProvider {
+            // nothing is checked yet, so both buttons do the one thing they can do
+            entry<Login> {
+                LoginScreen(
+                    onSignIn = { signIn(backStack) },
+                    onCreateAccount = { signIn(backStack) }
+                )
+            }
             // the three tabs draw their screen inside AppScaffold, so only they show the bar
             entry<TaskList>(metadata = LIST_PANE) {
                 AppScaffold(TopLevelDestination.TASKS, onSelectTab = { selectTab(backStack, it) }) {
@@ -157,6 +165,13 @@ private fun selectTab(backStack: NavBackStack<NavKey>, tab: TopLevelDestination)
 private fun openTask(backStack: NavBackStack<NavKey>, taskId: String) {
     backStack.removeAll { it is TaskDetail }
     backStack.add(TaskDetail(taskId))
+}
+
+// the login screen leaves the stack for good, so Back from Tasks leaves the app
+private fun signIn(backStack: NavBackStack<NavKey>) {
+    // two calls in one click, so the display never sees an empty stack
+    backStack.clear()
+    backStack.add(TaskList)
 }
 
 private const val FADE_MILLIS = 400

@@ -7,6 +7,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object TaskList : NavKey
 
+// the first screen, drawn outside the tabs, and gone from the stack once the user is in
+@Serializable
+data object Login : NavKey
+
 // the id travels as a field of the key, so there is nothing to parse
 @Serializable
 data class TaskDetail(val taskId: String) : NavKey
