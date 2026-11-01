@@ -11,6 +11,9 @@
     <string name="task_gone">This task is no longer here.</string>
     <string name="no_task_open">Choose a task to see it here.</string>
     <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_task_title">Delete this task?</string>
+    <string name="delete_task_message">This cannot be undone.</string>
     <string name="tasks_done_count">%1$d of %2$d done</string>
     <string name="tasks_all_done">All done</string>
     <string name="filter_all">All</string>
@@ -28,6 +31,7 @@
     <string name="form_pick_date">Pick a date</string>
     <string name="save">Save</string>
     <string name="task_saved">Task saved</string>
+    <string name="task_deleted">Task deleted</string>
     <string name="dismiss">Dismiss</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

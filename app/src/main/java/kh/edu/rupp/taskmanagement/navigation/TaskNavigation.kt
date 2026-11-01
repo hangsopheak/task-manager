@@ -73,13 +73,19 @@ fun TaskNavigation() {
                         onToggle = { store.toggle(task) },
                         onBack = { backStack.removeLastOrNull() },
                         onEdit = { backStack.add(EditTask(task.id)) },
+                        onDelete = {
+                            store.delete(task)
+                            store.message = R.string.task_deleted
+                            backStack.removeLastOrNull()
+                        },
                         message = if (backStack.lastOrNull() == key) store.message else null,
                         onMessageShown = { store.message = null }
                     )
-                } else {
+                } else if (key in backStack) {
                     // the key is saved across a rotation and the tasks are not, so it can outlive its task
                     TaskGoneScreen(onBack = { backStack.removeLastOrNull() })
                 }
+                // after a delete the key has left the stack as well, so the screen slides away empty
             }
             // the day's tasks are a list too, so a task opened here gets the same right pane
             entry<Calendar>(metadata = LIST_PANE) {
@@ -87,7 +93,10 @@ fun TaskNavigation() {
                     CalendarScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onTaskClick = { taskId -> openTask(backStack, taskId) }
+                        onTaskClick = { taskId -> openTask(backStack, taskId) },
+                        // a task opened from here comes back here after a delete
+                        message = if (backStack.lastOrNull() == Calendar) store.message else null,
+                        onMessageShown = { store.message = null }
                     )
                 }
             }

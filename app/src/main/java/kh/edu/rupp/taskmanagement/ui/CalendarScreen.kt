@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.MessageBar
 import kh.edu.rupp.taskmanagement.ui.components.MonthGrid
 import java.time.LocalDate
 import java.time.YearMonth
@@ -32,6 +33,8 @@ fun CalendarScreen(
     tasks: List<Task>,
     onToggle: (Task) -> Unit,
     onTaskClick: (String) -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // open on the earliest due date, never on today, so the fixed sample data is always in view
@@ -45,7 +48,8 @@ fun CalendarScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.calendar_title)) })
-        }
+        },
+        snackbarHost = { MessageBar(message, onDismiss = onMessageShown) }
     ) { innerPadding ->
         Column(
             Modifier

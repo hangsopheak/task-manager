@@ -21,6 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.ConfirmDeleteDialog
 import kh.edu.rupp.taskmanagement.ui.components.MessageBar
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
@@ -41,10 +46,13 @@ fun TaskDetailScreen(
     onToggle: () -> Unit,
     onBack: () -> Unit,
     onEdit: () -> Unit,
+    onDelete: () -> Unit,
     message: Int?,
     onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // whether the question is on screen belongs to this screen, and it survives a rotation
+    var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -62,6 +70,9 @@ fun TaskDetailScreen(
                 actions = {
                     TextButton(onClick = onEdit) {
                         Text(stringResource(R.string.edit))
+                    }
+                    TextButton(onClick = { isDeleteAsked = true }) {
+                        Text(stringResource(R.string.delete))
                     }
                 }
             )
@@ -119,6 +130,15 @@ fun TaskDetailScreen(
             }
             Spacer(Modifier.height(16.dp))
         }
+        if (isDeleteAsked) {
+            ConfirmDeleteDialog(
+                onConfirm = {
+                    isDeleteAsked = false
+                    onDelete()
+                },
+                onDismiss = { isDeleteAsked = false }
+            )
+        }
     }
 }
 
@@ -172,6 +192,7 @@ fun TaskDetailScreenPreview() {
             onToggle = {},
             onBack = {},
             onEdit = {},
+            onDelete = {},
             message = null,
             onMessageShown = {}
         )
