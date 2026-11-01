@@ -54,12 +54,16 @@ fun TaskNavigation() {
             }
             entry<Calendar> {
                 AppScaffold(TopLevelDestination.CALENDAR, onSelectTab = { selectTab(backStack, it) }) {
-                    CalendarScreen()
+                    CalendarScreen(
+                        tasks = store.tasks,
+                        onToggle = { store.toggle(it) },
+                        onTaskClick = { taskId -> backStack.add(TaskDetail(taskId)) }
+                    )
                 }
             }
             entry<Stats> {
                 AppScaffold(TopLevelDestination.STATS, onSelectTab = { selectTab(backStack, it) }) {
-                    StatsScreen()
+                    StatsScreen(store.tasks)
                 }
             }
             // a child of Tasks, not a tab: it is not drawn in AppScaffold, so it covers the bar
