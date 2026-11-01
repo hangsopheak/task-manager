@@ -1,5 +1,14 @@
 package kh.edu.rupp.taskmanagement.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -91,13 +101,36 @@ fun TaskListScreen(
                         vertical = dimensionResource(R.dimen.list_spacing)
                     )
                 )
-                if (allDone) {
-                    Text(
-                        stringResource(R.string.tasks_all_done),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                // a bouncy pop makes finishing the list feel like an achievement, and the list moves
+                // down smoothly instead of jumping
+                AnimatedVisibility(
+                    visible = allDone,
+                    enter = expandVertically(tween(ALL_DONE_MILLIS)) +
+                        fadeIn(tween(ALL_DONE_MILLIS)) +
+                        scaleIn(
+                            initialScale = 0.2f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioHighBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.extraLarge,
                         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.list_padding))
-                    )
+                    ) {
+                        Text(
+                            stringResource(R.string.tasks_all_done),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.card_padding_horizontal),
+                                vertical = dimensionResource(R.dimen.card_padding_vertical)
+                            )
+                        )
+                    }
                 }
                 FilterChipRow(
                     selected = selectedFilter,
@@ -131,3 +164,5 @@ fun TaskListScreen(
         }
     }
 }
+
+private const val ALL_DONE_MILLIS = 500

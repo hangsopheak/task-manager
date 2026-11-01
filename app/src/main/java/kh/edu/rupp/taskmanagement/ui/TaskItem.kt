@@ -1,5 +1,7 @@
 package kh.edu.rupp.taskmanagement.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +12,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -61,12 +64,17 @@ fun TaskItem(
                 verticalArrangement =
                     Arrangement.spacedBy(dimensionResource(R.dimen.card_text_spacing))
             ) {
+                // the done state flips at once, the colour follows it slowly enough to watch
+                val titleColor by animateColorAsState(
+                    targetValue =
+                        if (isDone) MaterialTheme.colorScheme.onSurface.copy(alpha = DONE_TITLE_ALPHA)
+                        else MaterialTheme.colorScheme.onSurface,
+                    animationSpec = tween(DONE_FADE_MILLIS)
+                )
                 Text(
                     task.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color =
-                        if (isDone) MaterialTheme.colorScheme.onSurfaceVariant
-                        else MaterialTheme.colorScheme.onSurface,
+                    color = titleColor,
                     textDecoration = if (isDone) TextDecoration.LineThrough else null,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -97,3 +105,6 @@ fun TaskItemPreview() {
         TaskItem(sampleTasks.first(), isDone = true, onToggle = {}, onClick = {})
     }
 }
+
+private const val DONE_FADE_MILLIS = 600
+private const val DONE_TITLE_ALPHA = 0.4f
