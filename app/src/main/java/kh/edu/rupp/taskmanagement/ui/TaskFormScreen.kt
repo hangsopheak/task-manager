@@ -31,6 +31,7 @@ import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.ui.components.DueDateField
 import kh.edu.rupp.taskmanagement.ui.form.TaskFormState
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +39,7 @@ fun TaskFormScreen(
     task: Task?,
     otherTitles: List<String>,
     onBack: () -> Unit,
+    onSave: (String, String, LocalDate, Priority) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // keyed on the task, so opening another task starts the form again from its values
@@ -63,7 +65,9 @@ fun TaskFormScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            onSave(form.title.trim(), form.description.trim(), form.dueDate, form.priority)
+                        },
                         enabled = form.isValid
                     ) {
                         Text(stringResource(R.string.save))

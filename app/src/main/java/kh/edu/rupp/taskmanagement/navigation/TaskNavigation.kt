@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.TaskStore
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.ui.AppScaffold
@@ -57,7 +58,10 @@ fun TaskNavigation() {
                         onToggle = { store.toggle(it) },
                         onAdd = { backStack.add(AddTask) },
                         onTaskClick = { taskId -> openTask(backStack, taskId) },
-                        onOpenSettings = { backStack.add(Settings) }
+                        onOpenSettings = { backStack.add(Settings) },
+                        // only the screen on top shows the message, so two panes never show it twice
+                        message = if (backStack.lastOrNull() == TaskList) store.message else null,
+                        onMessageShown = { store.message = null }
                     )
                 }
             }
@@ -68,7 +72,9 @@ fun TaskNavigation() {
                         task = task,
                         onToggle = { store.toggle(task) },
                         onBack = { backStack.removeLastOrNull() },
-                        onEdit = { backStack.add(EditTask(task.id)) }
+                        onEdit = { backStack.add(EditTask(task.id)) },
+                        message = if (backStack.lastOrNull() == key) store.message else null,
+                        onMessageShown = { store.message = null }
                     )
                 } else {
                     // the key is saved across a rotation and the tasks are not, so it can outlive its task
@@ -99,7 +105,13 @@ fun TaskNavigation() {
                 TaskFormScreen(
                     task = null,
                     otherTitles = store.tasks.map { it.title },
-                    onBack = { backStack.removeLastOrNull() }
+                    onBack = { backStack.removeLastOrNull() },
+                    onSave = { title, description, dueDate, priority ->
+                        store.save(null, title, description, dueDate, priority)
+                        store.message = R.string.task_saved
+                        // the same call as Back, so Back from the list never opens the form again
+                        backStack.removeLastOrNull()
+                    }
                 )
             }
             entry<EditTask>(metadata = CHILD_SLIDE) { key ->
@@ -109,7 +121,12 @@ fun TaskNavigation() {
                     TaskFormScreen(
                         task = task,
                         otherTitles = store.tasks.filter { it.id != task.id }.map { it.title },
-                        onBack = { backStack.removeLastOrNull() }
+                        onBack = { backStack.removeLastOrNull() },
+                        onSave = { title, description, dueDate, priority ->
+                            store.save(task.id, title, description, dueDate, priority)
+                            store.message = R.string.task_saved
+                            backStack.removeLastOrNull()
+                        }
                     )
                 } else {
                     TaskGoneScreen(onBack = { backStack.removeLastOrNull() })

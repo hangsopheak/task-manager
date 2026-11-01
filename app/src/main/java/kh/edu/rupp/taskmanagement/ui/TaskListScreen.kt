@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -41,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.model.Task
 import kh.edu.rupp.taskmanagement.ui.components.FilterChipRow
+import kh.edu.rupp.taskmanagement.ui.components.MessageBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +50,8 @@ fun TaskListScreen(
     onAdd: () -> Unit,
     onTaskClick: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedFilter by rememberSaveable { mutableStateOf(TaskFilter.ALL) }
@@ -82,7 +84,17 @@ fun TaskListScreen(
                     }
                 }
             )
-        }
+        },
+        // in the scaffold's own slot, so the scaffold moves it out of the way of the message
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAdd,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            ) {
+                Text("+", style = MaterialTheme.typography.headlineSmall)
+            }
+        },
+        snackbarHost = { MessageBar(message, onDismiss = onMessageShown) }
     ) { innerPadding ->
         Box(
             Modifier
@@ -149,15 +161,6 @@ fun TaskListScreen(
                         )
                     }
                 }
-            }
-            FloatingActionButton(
-                onClick = onAdd,
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(dimensionResource(R.dimen.list_padding))
-            ) {
-                Text("+", style = MaterialTheme.typography.headlineSmall)
             }
         }
     }

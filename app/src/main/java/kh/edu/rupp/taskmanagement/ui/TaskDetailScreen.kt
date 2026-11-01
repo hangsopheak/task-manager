@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.MessageBar
 import kh.edu.rupp.taskmanagement.ui.theme.TaskManagerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,8 @@ fun TaskDetailScreen(
     onToggle: () -> Unit,
     onBack: () -> Unit,
     onEdit: () -> Unit,
+    message: Int?,
+    onMessageShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -62,7 +65,8 @@ fun TaskDetailScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { MessageBar(message, onDismiss = onMessageShown) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -163,6 +167,13 @@ fun NoTaskOpen(modifier: Modifier = Modifier) {
 @Composable
 fun TaskDetailScreenPreview() {
     TaskManagerTheme {
-        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {})
+        TaskDetailScreen(
+            sampleTasks.first(),
+            onToggle = {},
+            onBack = {},
+            onEdit = {},
+            message = null,
+            onMessageShown = {}
+        )
     }
 }
