@@ -27,10 +27,6 @@
         <activity
             android:name=".concepts.ConceptsActivity"
             android:exported="false" />
-
-        <activity
-            android:name=".TaskDetailActivity"
-            android:exported="false" />
     </application>
 
 </manifest>
