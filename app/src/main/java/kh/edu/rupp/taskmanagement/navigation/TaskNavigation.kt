@@ -1,5 +1,10 @@
 package kh.edu.rupp.taskmanagement.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
@@ -26,6 +31,9 @@ fun TaskNavigation() {
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        // switching tabs is not a step forward, so a tab only fades
+        transitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
+        popTransitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
         entryProvider = entryProvider {
             // the three tabs draw their screen inside AppScaffold, so only they show the bar
             entry<TaskList> {
@@ -39,7 +47,7 @@ fun TaskNavigation() {
                     )
                 }
             }
-            entry<TaskDetail> { key ->
+            entry<TaskDetail>(metadata = CHILD_SLIDE) { key ->
                 val task = store.find(key.taskId)
                 if (task != null) {
                     TaskDetailScreen(
@@ -67,7 +75,7 @@ fun TaskNavigation() {
                 }
             }
             // a child of Tasks, not a tab: it is not drawn in AppScaffold, so it covers the bar
-            entry<Settings> {
+            entry<Settings>(metadata = CHILD_SLIDE) {
                 SettingsScreen(onBack = { backStack.removeLastOrNull() })
             }
         }
@@ -81,3 +89,19 @@ private fun selectTab(backStack: NavBackStack<NavKey>, tab: TopLevelDestination)
         backStack.add(tab.key)
     }
 }
+
+private const val FADE_MILLIS = 400
+private const val SLIDE_MILLIS = 500
+
+// the screen on top decides the motion both ways: in from the side, and out the way it came
+private val CHILD_SLIDE =
+    NavDisplay.transitionSpec {
+        slideIntoContainer(SlideDirection.Start, tween(SLIDE_MILLIS)) togetherWith
+            slideOutOfContainer(SlideDirection.Start, tween(SLIDE_MILLIS))
+    } + NavDisplay.popTransitionSpec {
+        slideIntoContainer(SlideDirection.End, tween(SLIDE_MILLIS)) togetherWith
+            slideOutOfContainer(SlideDirection.End, tween(SLIDE_MILLIS))
+    } + NavDisplay.predictivePopTransitionSpec {
+        slideIntoContainer(SlideDirection.End, tween(SLIDE_MILLIS)) togetherWith
+            slideOutOfContainer(SlideDirection.End, tween(SLIDE_MILLIS))
+    }
