@@ -10,3 +10,13 @@ data object TaskList : NavKey
 // the id travels as a field of the key, so there is nothing to parse
 @Serializable
 data class TaskDetail(val taskId: String) : NavKey
+
+// the two other tabs and Settings carry no data, so each is one object
+@Serializable
+data object Calendar : NavKey
+
+@Serializable
+data object Stats : NavKey
+
+@Serializable
+data object Settings : NavKey
