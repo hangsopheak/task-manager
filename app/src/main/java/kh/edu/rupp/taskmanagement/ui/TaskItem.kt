@@ -40,9 +40,11 @@ fun TaskItem(
     task: Task,
     isDone: Boolean,
     onToggle: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    // the card opens the task, the box inside it still only toggles done
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,7 +56,6 @@ fun TaskItem(
                 Arrangement.spacedBy(dimensionResource(R.dimen.card_row_spacing)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // only the box toggles: the rest of the card is left free for a later session
             Checkbox(checked = isDone, onCheckedChange = { onToggle() })
             Column(
                 verticalArrangement =
@@ -93,6 +94,6 @@ fun TaskItem(
 @Composable
 fun TaskItemPreview() {
     TaskManagerTheme {
-        TaskItem(sampleTasks.first(), isDone = true, onToggle = {})
+        TaskItem(sampleTasks.first(), isDone = true, onToggle = {}, onClick = {})
     }
 }
