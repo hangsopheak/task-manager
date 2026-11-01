@@ -36,11 +36,12 @@ import kh.edu.rupp.taskmanagement.ui.form.TaskFormState
 @Composable
 fun TaskFormScreen(
     task: Task?,
+    otherTitles: List<String>,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // keyed on the task, so opening another task starts the form again from its values
-    val form = remember(task) { TaskFormState(task) }
+    val form = remember(task) { TaskFormState(task, otherTitles) }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -88,9 +89,13 @@ fun TaskFormScreen(
                     form.isTitleTouched = true
                 },
                 label = { Text(stringResource(R.string.form_title_label)) },
-                isError = form.showTitleError,
+                isError = form.showTitleError || !form.isTitleFree,
                 supportingText = {
-                    if (form.showTitleError) Text(stringResource(R.string.form_title_error))
+                    if (form.showTitleError) {
+                        Text(stringResource(R.string.form_title_error))
+                    } else if (!form.isTitleFree) {
+                        Text(stringResource(R.string.form_title_taken))
+                    }
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -99,6 +104,12 @@ fun TaskFormScreen(
                 value = form.description,
                 onValueChange = { form.description = it },
                 label = { Text(stringResource(R.string.form_description)) },
+                isError = !form.isDescriptionValid,
+                supportingText = {
+                    if (!form.isDescriptionValid) {
+                        Text(stringResource(R.string.form_description_error))
+                    }
+                },
                 minLines = 4,
                 modifier = Modifier.fillMaxWidth()
             )

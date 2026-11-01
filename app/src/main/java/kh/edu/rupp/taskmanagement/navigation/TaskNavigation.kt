@@ -96,12 +96,21 @@ fun TaskNavigation() {
             }
             // the form is a child too, with no pane of its own, so it covers the whole window
             entry<AddTask>(metadata = CHILD_SLIDE) {
-                TaskFormScreen(task = null, onBack = { backStack.removeLastOrNull() })
+                TaskFormScreen(
+                    task = null,
+                    otherTitles = store.tasks.map { it.title },
+                    onBack = { backStack.removeLastOrNull() }
+                )
             }
             entry<EditTask>(metadata = CHILD_SLIDE) { key ->
                 val task = store.find(key.taskId)
                 if (task != null) {
-                    TaskFormScreen(task = task, onBack = { backStack.removeLastOrNull() })
+                    // the task being edited keeps its own title, so leave it out of the list
+                    TaskFormScreen(
+                        task = task,
+                        otherTitles = store.tasks.filter { it.id != task.id }.map { it.title },
+                        onBack = { backStack.removeLastOrNull() }
+                    )
                 } else {
                     TaskGoneScreen(onBack = { backStack.removeLastOrNull() })
                 }
