@@ -8,6 +8,7 @@ import androidx.navigation3.ui.NavDisplay
 import kh.edu.rupp.taskmanagement.data.TaskStore
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
+import kh.edu.rupp.taskmanagement.ui.TaskGoneScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 
 @Composable
@@ -31,7 +32,14 @@ fun TaskNavigation() {
             entry<TaskDetail> { key ->
                 val task = store.find(key.taskId)
                 if (task != null) {
-                    TaskDetailScreen(task)
+                    TaskDetailScreen(
+                        task = task,
+                        onToggle = { store.toggle(task) },
+                        onBack = { backStack.removeLastOrNull() }
+                    )
+                } else {
+                    // the key is saved across a rotation and the tasks are not, so it can outlive its task
+                    TaskGoneScreen(onBack = { backStack.removeLastOrNull() })
                 }
             }
         }
