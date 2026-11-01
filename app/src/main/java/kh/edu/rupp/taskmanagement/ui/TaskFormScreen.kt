@@ -18,6 +18,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -58,6 +59,14 @@ fun TaskFormScreen(
                             contentDescription = stringResource(R.string.back)
                         )
                     }
+                },
+                actions = {
+                    TextButton(
+                        onClick = {},
+                        enabled = form.isValid
+                    ) {
+                        Text(stringResource(R.string.save))
+                    }
                 }
             )
         }
@@ -74,8 +83,15 @@ fun TaskFormScreen(
             // value and onValueChange are the whole contract: show this, tell me that
             OutlinedTextField(
                 value = form.title,
-                onValueChange = { form.title = it },
+                onValueChange = {
+                    form.title = it
+                    form.isTitleTouched = true
+                },
                 label = { Text(stringResource(R.string.form_title_label)) },
+                isError = form.showTitleError,
+                supportingText = {
+                    if (form.showTitleError) Text(stringResource(R.string.form_title_error))
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
