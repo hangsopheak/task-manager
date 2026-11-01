@@ -20,3 +20,10 @@ data object Stats : NavKey
 
 @Serializable
 data object Settings : NavKey
+
+// adding and editing open the same form, and only the edit key carries an id
+@Serializable
+data object AddTask : NavKey
+
+@Serializable
+data class EditTask(val taskId: String) : NavKey

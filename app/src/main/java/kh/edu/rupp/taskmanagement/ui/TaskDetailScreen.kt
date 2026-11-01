@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ fun TaskDetailScreen(
     task: Task,
     onToggle: () -> Unit,
     onBack: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -52,6 +54,11 @@ fun TaskDetailScreen(
                             painterResource(R.drawable.ic_arrow_back),
                             contentDescription = stringResource(R.string.back)
                         )
+                    }
+                },
+                actions = {
+                    TextButton(onClick = onEdit) {
+                        Text(stringResource(R.string.edit))
                     }
                 }
             )
@@ -156,6 +163,6 @@ fun NoTaskOpen(modifier: Modifier = Modifier) {
 @Composable
 fun TaskDetailScreenPreview() {
     TaskManagerTheme {
-        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {})
+        TaskDetailScreen(sampleTasks.first(), onToggle = {}, onBack = {}, onEdit = {})
     }
 }

@@ -25,6 +25,7 @@ import kh.edu.rupp.taskmanagement.ui.NoTaskOpen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
+import kh.edu.rupp.taskmanagement.ui.TaskFormScreen
 import kh.edu.rupp.taskmanagement.ui.TaskGoneScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 
@@ -54,7 +55,7 @@ fun TaskNavigation() {
                     TaskListScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onAdd = { title, description -> store.add(title, description) },
+                        onAdd = { backStack.add(AddTask) },
                         onTaskClick = { taskId -> openTask(backStack, taskId) },
                         onOpenSettings = { backStack.add(Settings) }
                     )
@@ -66,7 +67,8 @@ fun TaskNavigation() {
                     TaskDetailScreen(
                         task = task,
                         onToggle = { store.toggle(task) },
-                        onBack = { backStack.removeLastOrNull() }
+                        onBack = { backStack.removeLastOrNull() },
+                        onEdit = { backStack.add(EditTask(task.id)) }
                     )
                 } else {
                     // the key is saved across a rotation and the tasks are not, so it can outlive its task
@@ -91,6 +93,18 @@ fun TaskNavigation() {
             // a child of Tasks, not a tab: it is not drawn in AppScaffold, so it covers the bar
             entry<Settings>(metadata = CHILD_SLIDE) {
                 SettingsScreen(onBack = { backStack.removeLastOrNull() })
+            }
+            // the form is a child too, with no pane of its own, so it covers the whole window
+            entry<AddTask>(metadata = CHILD_SLIDE) {
+                TaskFormScreen(task = null, onBack = { backStack.removeLastOrNull() })
+            }
+            entry<EditTask>(metadata = CHILD_SLIDE) { key ->
+                val task = store.find(key.taskId)
+                if (task != null) {
+                    TaskFormScreen(task = task, onBack = { backStack.removeLastOrNull() })
+                } else {
+                    TaskGoneScreen(onBack = { backStack.removeLastOrNull() })
+                }
             }
         }
     )
