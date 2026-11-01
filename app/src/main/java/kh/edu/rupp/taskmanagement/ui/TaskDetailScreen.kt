@@ -1,6 +1,7 @@
 package kh.edu.rupp.taskmanagement.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -135,6 +136,18 @@ fun TaskGoneScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
+        )
+    }
+}
+
+// the right pane on a wide screen while no task is open
+@Composable
+fun NoTaskOpen(modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            stringResource(R.string.no_task_open),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

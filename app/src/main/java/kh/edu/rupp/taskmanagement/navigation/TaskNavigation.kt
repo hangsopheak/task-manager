@@ -5,8 +5,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -16,38 +21,46 @@ import kh.edu.rupp.taskmanagement.data.TaskStore
 import kh.edu.rupp.taskmanagement.data.sampleTasks
 import kh.edu.rupp.taskmanagement.ui.AppScaffold
 import kh.edu.rupp.taskmanagement.ui.CalendarScreen
+import kh.edu.rupp.taskmanagement.ui.NoTaskOpen
 import kh.edu.rupp.taskmanagement.ui.SettingsScreen
 import kh.edu.rupp.taskmanagement.ui.StatsScreen
 import kh.edu.rupp.taskmanagement.ui.TaskDetailScreen
 import kh.edu.rupp.taskmanagement.ui.TaskGoneScreen
 import kh.edu.rupp.taskmanagement.ui.TaskListScreen
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun TaskNavigation() {
     // saved across a rotation, because every key on it is @Serializable
     val backStack = rememberNavBackStack(TaskList)
     // a plain remember, so the tasks start again after a rotation
     val store = remember { TaskStore(sampleTasks) }
+    // on a wide window it shows a list entry and a detail entry side by side as one scene
+    val listDetail = rememberListDetailSceneStrategy<NavKey>(
+        // Back closes the open task, the same as Up, instead of leaving both panes at once
+        backNavigationBehavior = BackNavigationBehavior.PopUntilContentChange
+    )
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        sceneStrategies = listOf(listDetail),
         // switching tabs is not a step forward, so a tab only fades
         transitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
         popTransitionSpec = { fadeIn(tween(FADE_MILLIS)) togetherWith fadeOut(tween(FADE_MILLIS)) },
         entryProvider = entryProvider {
             // the three tabs draw their screen inside AppScaffold, so only they show the bar
-            entry<TaskList> {
+            entry<TaskList>(metadata = LIST_PANE) {
                 AppScaffold(TopLevelDestination.TASKS, onSelectTab = { selectTab(backStack, it) }) {
                     TaskListScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
                         onAdd = { title, description -> store.add(title, description) },
-                        onTaskClick = { taskId -> backStack.add(TaskDetail(taskId)) },
+                        onTaskClick = { taskId -> openTask(backStack, taskId) },
                         onOpenSettings = { backStack.add(Settings) }
                     )
                 }
             }
-            entry<TaskDetail>(metadata = CHILD_SLIDE) { key ->
+            entry<TaskDetail>(metadata = CHILD_SLIDE + ListDetailSceneStrategy.detailPane()) { key ->
                 val task = store.find(key.taskId)
                 if (task != null) {
                     TaskDetailScreen(
@@ -60,12 +73,13 @@ fun TaskNavigation() {
                     TaskGoneScreen(onBack = { backStack.removeLastOrNull() })
                 }
             }
-            entry<Calendar> {
+            // the day's tasks are a list too, so a task opened here gets the same right pane
+            entry<Calendar>(metadata = LIST_PANE) {
                 AppScaffold(TopLevelDestination.CALENDAR, onSelectTab = { selectTab(backStack, it) }) {
                     CalendarScreen(
                         tasks = store.tasks,
                         onToggle = { store.toggle(it) },
-                        onTaskClick = { taskId -> backStack.add(TaskDetail(taskId)) }
+                        onTaskClick = { taskId -> openTask(backStack, taskId) }
                     )
                 }
             }
@@ -90,6 +104,12 @@ private fun selectTab(backStack: NavBackStack<NavKey>, tab: TopLevelDestination)
     }
 }
 
+// one open task at a time, so a wide window never hides a pile of them behind the one on screen
+private fun openTask(backStack: NavBackStack<NavKey>, taskId: String) {
+    backStack.removeAll { it is TaskDetail }
+    backStack.add(TaskDetail(taskId))
+}
+
 private const val FADE_MILLIS = 400
 private const val SLIDE_MILLIS = 500
 
@@ -105,3 +125,9 @@ private val CHILD_SLIDE =
         slideIntoContainer(SlideDirection.End, tween(SLIDE_MILLIS)) togetherWith
             slideOutOfContainer(SlideDirection.End, tween(SLIDE_MILLIS))
     }
+
+// room for the rail and a phone-width list, because the rail is drawn inside the tab screen
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+private val LIST_PANE =
+    ListDetailSceneStrategy.listPane(detailPlaceholder = { NoTaskOpen() }) +
+        ListDetailSceneStrategy.preferredPaneSize(width = 440.dp)
