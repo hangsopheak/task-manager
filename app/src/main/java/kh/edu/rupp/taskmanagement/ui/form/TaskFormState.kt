@@ -36,4 +36,14 @@ class TaskFormState(task: Task?, private val otherTitles: List<String>) {
 
     val showTitleError: Boolean
         get() = isTitleTouched && !isTitleValid
+
+    // the values the form opened with, so it can tell whether the user changed anything
+    private val startTitle = title
+    private val startDescription = description
+    private val startPriority = priority
+    private val startDueDate = dueDate
+
+    val isDirty: Boolean
+        get() = title != startTitle || description != startDescription ||
+            priority != startPriority || dueDate != startDueDate
 }

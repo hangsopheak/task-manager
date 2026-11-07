@@ -1,5 +1,6 @@
 package kh.edu.rupp.taskmanagement.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import kh.edu.rupp.taskmanagement.R
 import kh.edu.rupp.taskmanagement.model.Priority
 import kh.edu.rupp.taskmanagement.model.Task
+import kh.edu.rupp.taskmanagement.ui.components.ConfirmDiscardDialog
 import kh.edu.rupp.taskmanagement.ui.components.DueDateField
 import kh.edu.rupp.taskmanagement.ui.form.TaskFormState
 import java.time.LocalDate
@@ -44,6 +50,9 @@ fun TaskFormScreen(
 ) {
     // keyed on the task, so opening another task starts the form again from its values
     val form = remember(task) { TaskFormState(task, otherTitles) }
+    var isDiscardAsked by rememberSaveable { mutableStateOf(false) }
+    // only while there are changes: Back on an untouched form just closes it
+    BackHandler(enabled = form.isDirty) { isDiscardAsked = true }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -56,7 +65,7 @@ fun TaskFormScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { if (form.isDirty) isDiscardAsked = true else onBack() }) {
                         Icon(
                             painterResource(R.drawable.ic_arrow_back),
                             contentDescription = stringResource(R.string.back)
@@ -124,6 +133,15 @@ fun TaskFormScreen(
             DueDateField(
                 dueDate = form.dueDate,
                 onPick = { form.dueDate = it }
+            )
+        }
+        if (isDiscardAsked) {
+            ConfirmDiscardDialog(
+                onConfirm = {
+                    isDiscardAsked = false
+                    onBack()
+                },
+                onDismiss = { isDiscardAsked = false }
             )
         }
     }

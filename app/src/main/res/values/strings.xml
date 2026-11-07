@@ -32,6 +32,10 @@
     <string name="save">Save</string>
     <string name="task_saved">Task saved</string>
     <string name="task_deleted">Task deleted</string>
+    <string name="discard">Discard</string>
+    <string name="discard_title">Discard your changes?</string>
+    <string name="discard_message">Your changes to this task will be lost.</string>
+    <string name="keep_editing">Keep editing</string>
     <string name="dismiss">Dismiss</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
